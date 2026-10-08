@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+.remember
+test-results
+playwright-report
+*.local
+
+# Kids photos stay on this machine and the tablet only
+assets/avatars/*
+!assets/avatars/.gitkeep
