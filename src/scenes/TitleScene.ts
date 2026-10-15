@@ -63,7 +63,7 @@ export class TitleScene extends Phaser.Scene {
     });
   }
 
-  /** "Осман и Сафия" with letters dropping in one by one. */
+  /** "Осман, Сафия и Умар" with letters dropping in one by one. */
   private logo(): Phaser.GameObjects.Container {
     const c = this.add.container(GAME_WIDTH / 2, 300).setDepth(20);
     const style = {
