@@ -56,39 +56,38 @@ export type FruitId = keyof typeof FRUITS;
 export type CarModel = keyof typeof CAR_MODELS;
 export type TrackId = keyof typeof TRACKS;
 
-const NUMBERS = [
-  'Один',
-  'Два',
-  'Три',
-  'Четыре',
-  'Пять',
-  'Шесть',
-  'Семь',
-  'Восемь',
-  'Девять',
-  'Десять',
-  'Одиннадцать',
-  'Двенадцать',
-  'Тринадцать',
-  'Четырнадцать',
-  'Пятнадцать',
-  'Шестнадцать',
-  'Семнадцать',
-  'Восемнадцать',
-  'Девятнадцать',
-  'Двадцать',
-  'Двадцать один',
-  'Двадцать два',
-  'Двадцать три',
-  'Двадцать четыре',
-  'Двадцать пять',
-  'Двадцать шесть',
-  'Двадцать семь',
-  'Двадцать восемь',
-  'Двадцать девять',
-  'Тридцать',
+const UNITS = ['', 'одну', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+const TEENS = [
+  'десять',
+  'одиннадцать',
+  'двенадцать',
+  'тринадцать',
+  'четырнадцать',
+  'пятнадцать',
+  'шестнадцать',
+  'семнадцать',
+  'восемнадцать',
+  'девятнадцать',
 ];
-export const MAX_SPOKEN_NUMBER = NUMBERS.length;
+const TENS = ['', '', 'двадцать', 'тридцать'];
+
+/** "Ты собрал семь звёзд!" with the right number words and noun form (звезду / звезды / звёзд). */
+export function starsSentence(n: number): string {
+  const words =
+    n < 10
+      ? UNITS[n]
+      : n < 20
+        ? TEENS[n - 10]
+        : [TENS[Math.floor(n / 10)], UNITS[n % 10]].filter(Boolean).join(' ');
+  const last = n % 10;
+  const teen = n % 100 >= 11 && n % 100 <= 14;
+  const noun =
+    !teen && last === 1 ? 'звезду' : !teen && last >= 2 && last <= 4 ? 'звезды' : 'звёзд';
+  return `Ты собрал ${words} ${noun}!`;
+}
+
+/** Star counts with their own spoken sentence; more stars are announced as this many. */
+export const MAX_SPOKEN_NUMBER = 30;
 
 function build(): Record<string, string> {
   const v: Record<string, string> = {
@@ -109,10 +108,9 @@ function build(): Record<string, string> {
     oops: 'Ой! Осторожно!',
     overtake: 'Обогнал!',
     finish: 'Финиш! Ты первый!',
-    stars: 'Ты собрал звёзд:',
     cup: 'Кубок твой! Молодец, Осман!',
   };
-  NUMBERS.forEach((n, i) => (v[`num_${i + 1}`] = `${n}!`));
+  for (let n = 1; n <= MAX_SPOKEN_NUMBER; n++) v[`stars_${n}`] = starsSentence(n);
   for (const [id, a] of Object.entries(ANIMALS)) {
     v[`snd_${id}`] = a.sound;
     for (const [fid, f] of Object.entries(FRUITS))

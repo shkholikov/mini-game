@@ -343,7 +343,7 @@ export class RaceScene extends Phaser.Scene {
     });
 
     const spoken = Math.min(this.stars, MAX_SPOKEN_NUMBER);
-    await voice().say('finish', ...(spoken > 0 ? ['stars', `num_${spoken}`] : []), 'cup');
+    await voice().say('finish', ...(spoken > 0 ? [`stars_${spoken}`] : []), 'cup');
 
     card.add(
       iconButton(
