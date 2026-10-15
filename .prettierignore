@@ -1,0 +1,7 @@
+dist
+pnpm-lock.yaml
+.claude
+.remember
+playwright-report
+test-results
+public/assets
