@@ -10,6 +10,8 @@ import { FeedScene } from './scenes/FeedScene';
 import { GarageScene } from './scenes/GarageScene';
 import { RaceScene } from './scenes/RaceScene';
 import { TitleScene } from './scenes/TitleScene';
+import { TractorScene } from './scenes/TractorScene';
+import { setSongPortrait } from './systems/song';
 import { installTouchGuards } from './systems/TouchGuards';
 import { initVoice } from './systems/voice';
 import { loadFonts } from './ui/theme';
@@ -37,13 +39,14 @@ async function start(): Promise<void> {
     },
     input: { activePointers: 3 },
     disableContextMenu: true,
-    scene: [BootScene, TitleScene, FeedScene, GarageScene, RaceScene],
+    scene: [BootScene, TitleScene, FeedScene, GarageScene, RaceScene, TractorScene],
   });
   initVoice(game);
 
   // Upright device: pause the game and its sounds until it is turned back.
   const portrait = window.matchMedia('(orientation: portrait)');
   const apply = (): void => {
+    setSongPortrait(portrait.matches);
     if (portrait.matches) {
       game.sound.pauseAll();
       game.loop.sleep();

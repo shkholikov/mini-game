@@ -76,3 +76,58 @@ test('both games start from the title screen without errors', async ({ page }) =
 
   expect(errors).toEqual([]);
 });
+
+test('Умар: tractor honks, hold-home panel adds and removes a song', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' || m.text().includes('[voice] missing')) errors.push(m.text());
+  });
+
+  await page.goto('/');
+  await expect.poll(() => activeScenes(page)).toContain('Title');
+  await tap(page, 800, 600); // Play
+  await page.waitForTimeout(1500);
+  const umar = await page.evaluate(() => {
+    const g = (window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } })
+      .__game;
+    const t = g.scene.getScene('Title') as { sides: { umar: { zone: { x: number; y: number } } } };
+    return { x: t.sides.umar.zone.x, y: t.sides.umar.zone.y };
+  });
+  await tap(page, umar.x, umar.y);
+  await expect.poll(() => activeScenes(page)).toContain('Tractor');
+
+  await tap(page, 800, 780); // honk on the grass
+  await tap(page, 270, 86); // a quick tap on home does nothing
+  await page.waitForTimeout(500);
+  expect(await activeScenes(page)).toContain('Tractor');
+
+  const b = (await page.locator('#game canvas:not(#stage3d)').boundingBox())!;
+  await page.mouse.move(b.x + (270 * b.width) / 1600, b.y + (86 * b.height) / 900);
+  await page.mouse.down();
+  await page.waitForTimeout(2400);
+  await page.mouse.up();
+
+  // parent adds a song from the tablet, then removes it
+  const status = () =>
+    page.evaluate(
+      () =>
+        (
+          (
+            window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } }
+          ).__game.scene.getScene('Tractor') as { status: { text: string } | null }
+        ).status?.text ?? '',
+    );
+  await expect.poll(status).toBe('Песни нет');
+  const chooser = page.waitForEvent('filechooser');
+  await tap(page, 600, 440);
+  await (await chooser).setFiles('public/assets/sfx/horn.mp3');
+  await expect.poll(status).toBe('Песня есть');
+  await tap(page, 1000, 440);
+  await expect.poll(status).toBe('Песни нет');
+
+  await tap(page, 640, 600); // home in the parent panel
+  await expect.poll(() => activeScenes(page)).toContain('Title');
+
+  expect(errors).toEqual([]);
+});

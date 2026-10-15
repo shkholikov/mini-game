@@ -1,5 +1,5 @@
 {
-  "who_plays": "eleven:cgSgspJ2msm6clMCkdW9|Кто играет? Осман или Сафия?",
+  "who_plays": "eleven:cgSgspJ2msm6clMCkdW9|Кто играет? Осман, Сафия или Умар?",
   "hi_osman": "eleven:cgSgspJ2msm6clMCkdW9|Осман, поехали на гонки!",
   "hi_safia": "eleven:cgSgspJ2msm6clMCkdW9|Сафия, давай покормим зверят!",
   "yum": "eleven:cgSgspJ2msm6clMCkdW9|Ням-ням! Спасибо!",
@@ -151,5 +151,18 @@
   "stars_27": "eleven:cgSgspJ2msm6clMCkdW9|Ты собрал двадцать семь звёзд!",
   "stars_28": "eleven:cgSgspJ2msm6clMCkdW9|Ты собрал двадцать восемь звёзд!",
   "stars_29": "eleven:cgSgspJ2msm6clMCkdW9|Ты собрал двадцать девять звёзд!",
-  "stars_30": "eleven:cgSgspJ2msm6clMCkdW9|Ты собрал тридцать звёзд!"
+  "stars_30": "eleven:cgSgspJ2msm6clMCkdW9|Ты собрал тридцать звёзд!",
+  "hi_umar": "eleven:cgSgspJ2msm6clMCkdW9|Умар, поехали на тракторе!",
+  "bibi": "eleven:cgSgspJ2msm6clMCkdW9|Би-би!",
+  "peek": "eleven:cgSgspJ2msm6clMCkdW9|Кто там прячется?",
+  "kuku": "eleven:cgSgspJ2msm6clMCkdW9|Ку-ку!",
+  "name_cow": "eleven:cgSgspJ2msm6clMCkdW9|Коровка!",
+  "name_chick": "eleven:cgSgspJ2msm6clMCkdW9|Цыплёнок!",
+  "name_cat": "eleven:cgSgspJ2msm6clMCkdW9|Котик!",
+  "name_dog": "eleven:cgSgspJ2msm6clMCkdW9|Собачка!",
+  "name_bunny": "eleven:cgSgspJ2msm6clMCkdW9|Зайчик!",
+  "name_monkey": "eleven:cgSgspJ2msm6clMCkdW9|Обезьянка!",
+  "name_panda": "eleven:cgSgspJ2msm6clMCkdW9|Панда!",
+  "name_elephant": "eleven:cgSgspJ2msm6clMCkdW9|Слоник!",
+  "name_giraffe": "eleven:cgSgspJ2msm6clMCkdW9|Жираф!"
 }

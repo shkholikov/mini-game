@@ -7,3 +7,6 @@ playwright-report
 *.local
 .vercel
 voice-samples
+# Умар's song stays on the tablet (IndexedDB), never in the repo
+/*.mp3
+/*.mp4

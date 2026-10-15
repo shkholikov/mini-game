@@ -3,6 +3,7 @@ import { CAR_MODELS, type CarModel, type TrackId } from '../i18n/ru';
 export interface Progress {
   version: 1;
   safia: { fed: number; parties: number };
+  umar: { rides: number };
   osman: {
     car: CarModel;
     races: number;
@@ -22,6 +23,7 @@ export function defaultProgress(): Progress {
   return {
     version: 1,
     safia: { fed: 0, parties: 0 },
+    umar: { rides: 0 },
     osman: {
       car: 'race',
       races: 0,
@@ -37,6 +39,7 @@ function merge(raw: Partial<Progress>): Progress {
   return {
     version: 1,
     safia: { ...d.safia, ...raw.safia },
+    umar: { ...d.umar, ...raw.umar },
     osman: {
       ...d.osman,
       ...raw.osman,

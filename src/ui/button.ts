@@ -127,6 +127,57 @@ export function homeButton(scene: Phaser.Scene): Phaser.GameObjects.Container {
   ).setDepth(100);
 }
 
+/**
+ * Home button for Умар's mode: it only works when held for `holdMs`; a white ring fills meanwhile.
+ * A quick tap (or a toddler's palm) does nothing.
+ */
+export function holdButton(
+  scene: Phaser.Scene,
+  icon: string,
+  color: number,
+  holdMs: number,
+  onHold: () => void,
+): Phaser.GameObjects.Container {
+  const size = 104;
+  const btn = iconButton(scene, 270, 86, icon, color, () => undefined, size).setDepth(100);
+  const ring = scene.add.graphics();
+  btn.add(ring);
+  const state = { p: 0 };
+  let tween: Phaser.Tweens.Tween | null = null;
+  const radius = size / 2 + 18;
+  const draw = (): void => {
+    ring.clear();
+    if (state.p <= 0) return;
+    ring.lineStyle(14, 0x000000, 0.25).strokeCircle(0, 4, radius);
+    ring.lineStyle(14, 0xffffff, 1);
+    ring.beginPath();
+    ring.arc(0, 4, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * state.p);
+    ring.strokePath();
+  };
+  const cancel = (): void => {
+    tween?.stop();
+    tween = null;
+    state.p = 0;
+    draw();
+  };
+  btn.on('pointerdown', () => {
+    cancel();
+    tween = scene.tweens.add({
+      targets: state,
+      p: 1,
+      duration: holdMs,
+      onUpdate: draw,
+      onComplete: () => {
+        cancel();
+        onHold();
+      },
+    });
+  });
+  btn.on('pointerup', cancel);
+  btn.on('pointerout', cancel);
+  return btn;
+}
+
 /** Little white sticker with an icon and a number (cups, hearts, stars). */
 export function sticker(
   scene: Phaser.Scene,

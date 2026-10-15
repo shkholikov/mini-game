@@ -8,6 +8,8 @@ export const PLAYER_CARS = ['race', 'police', 'firetruck', 'ambulance', 'taxi'] 
 export type PlayerCar = (typeof PLAYER_CARS)[number];
 export const RIVAL_CARS = ['sedan', 'suv', 'van', 'truck', 'delivery', 'hatchback-sports'] as const;
 const PROPS = ['cone', 'box', 'debris-tire'] as const;
+/** Умар's tractor (Car Kit), repainted blue on load. */
+const FARM = ['tractor'] as const;
 /** Racing Kit pieces (1 unit grid, scaled up in the world). */
 const TRACK = [
   'grandStand',
@@ -34,7 +36,7 @@ export function loadModels(onProgress?: (v: number) => void): Promise<void> {
   if (loading) return loading;
   const loader = new GLTFLoader();
   const jobs = [
-    ...[...PLAYER_CARS, ...RIVAL_CARS, ...PROPS].map(
+    ...[...PLAYER_CARS, ...RIVAL_CARS, ...PROPS, ...FARM].map(
       (n) => [n, `assets/3d/cars/${n}.glb`] as const,
     ),
     ...TRACK.map((n) => [n, `assets/3d/track/${n}.glb`] as const),
@@ -55,6 +57,7 @@ export function loadModels(onProgress?: (v: number) => void): Promise<void> {
               o.userData.shared = true;
             }
           });
+          if (name === 'tractor') paintBlue(gltf.scene);
           cache.set(name, normalize(gltf.scene));
           if (gltf.animations.length) clips.set(name, gltf.animations);
         })
@@ -63,6 +66,51 @@ export function loadModels(onProgress?: (v: number) => void): Promise<void> {
     ),
   ).then(() => undefined);
   return loading;
+}
+
+/**
+ * Gives a model its own copy of the shared colour atlas with the warm paint (orange, yellow)
+ * turned blue, so only this model changes colour.
+ */
+function paintBlue(root: THREE.Object3D): void {
+  const done = new Map<THREE.Texture, THREE.Texture>();
+  root.traverse((o) => {
+    if (!(o instanceof THREE.Mesh)) return;
+    const mat = (o.material as THREE.MeshStandardMaterial).clone();
+    const src = mat.map;
+    if (!src?.image) return;
+    let blue = done.get(src);
+    if (!blue) {
+      const img = src.image as CanvasImageSource & { width: number; height: number };
+      const c = document.createElement('canvas');
+      c.width = img.width;
+      c.height = img.height;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      const data = ctx.getImageData(0, 0, c.width, c.height);
+      const px = data.data;
+      const color = new THREE.Color();
+      const hsl = { h: 0, s: 0, l: 0 };
+      for (let i = 0; i < px.length; i += 4) {
+        color.setRGB(px[i]! / 255, px[i + 1]! / 255, px[i + 2]! / 255);
+        color.getHSL(hsl);
+        if (hsl.s < 0.45 || hsl.h < 15 / 360 || hsl.h > 55 / 360) continue;
+        color.setHSL(0.6, 0.85, Math.min(0.62, hsl.l * 0.85));
+        px[i] = color.r * 255;
+        px[i + 1] = color.g * 255;
+        px[i + 2] = color.b * 255;
+      }
+      ctx.putImageData(data, 0, 0);
+      blue = new THREE.CanvasTexture(c);
+      blue.flipY = src.flipY;
+      blue.colorSpace = src.colorSpace;
+      blue.magFilter = src.magFilter;
+      blue.minFilter = src.minFilter;
+      done.set(src, blue);
+    }
+    mat.map = blue;
+    o.material = mat;
+  });
 }
 
 /** Wraps a model so its footprint is centred on x/z and it stands on y = 0. */

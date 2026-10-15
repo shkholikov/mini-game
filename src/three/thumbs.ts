@@ -12,7 +12,7 @@ interface Shot {
 
 /**
  * Renders 3D models once into Phaser textures:
- * `thumb_<car>`, `thumb_pet_<animal>`, `thumb_fruit_<fruit>` (title, HUD, bubbles, progress row).
+ * `thumb_<car>`, `thumb_tractor`, `thumb_pet_<animal>`, `thumb_fruit_<fruit>` (title, HUD, bubbles, progress row).
  */
 export function makeThumbs(textures: Phaser.Textures.TextureManager, size = 320): void {
   const renderer = new THREE.WebGLRenderer({
@@ -35,6 +35,11 @@ export function makeThumbs(textures: Phaser.Textures.TextureManager, size = 320)
       make: () => model(c, 1),
       from: new THREE.Vector3(5.2, 3.6, 5.2),
     })),
+    {
+      key: 'thumb_tractor',
+      make: () => model('tractor', 1),
+      from: new THREE.Vector3(5.2, 3.6, 5.2),
+    },
     ...Object.keys(ANIMALS).map((a) => ({
       key: `thumb_pet_${a}`,
       make: () => model(`pet_${a}`, 1),

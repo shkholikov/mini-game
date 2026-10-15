@@ -1,15 +1,21 @@
 /** All Russian text and voice lines. Voice files are generated from VOICE by `pnpm voice`. */
 
 export const TEXT = {
-  title: 'Осман и Сафия',
+  title: 'Осман, Сафия и Умар',
   osman: 'Осман',
   safia: 'Сафия',
+  umar: 'Умар',
   rotateTitle: 'Поверните экран',
   rotateSub: 'Игра работает только горизонтально',
   garage: 'Гараж',
   finish: 'Финиш!',
   go: ['На старт!', 'Внимание!', 'Марш!'],
   tracks: { city: 'Город', forest: 'Лес', desert: 'Пустыня' },
+  // parent panel in Умар's tractor mode (adults read these, not the kids)
+  parentSong: 'Песня',
+  parentNoSong: 'Убрать песню',
+  parentSongOn: 'Песня есть',
+  parentSongOff: 'Песни нет',
 } as const;
 
 export const ANIMALS = {
@@ -91,9 +97,10 @@ export const MAX_SPOKEN_NUMBER = 30;
 
 function build(): Record<string, string> {
   const v: Record<string, string> = {
-    who_plays: 'Кто играет? Осман или Сафия?',
+    who_plays: 'Кто играет? Осман, Сафия или Умар?',
     hi_osman: 'Осман, поехали на гонки!',
     hi_safia: 'Сафия, давай покормим зверят!',
+    hi_umar: 'Умар, поехали на тракторе!',
     // Сафия
     yum: 'Ням-ням! Спасибо!',
     yum_safia: 'Вкусно! Спасибо, Сафия!',
@@ -109,10 +116,15 @@ function build(): Record<string, string> {
     overtake: 'Обогнал!',
     finish: 'Финиш! Ты первый!',
     cup: 'Кубок твой! Молодец, Осман!',
+    // Умар
+    bibi: 'Би-би!',
+    peek: 'Кто там прячется?',
+    kuku: 'Ку-ку!',
   };
   for (let n = 1; n <= MAX_SPOKEN_NUMBER; n++) v[`stars_${n}`] = starsSentence(n);
   for (const [id, a] of Object.entries(ANIMALS)) {
     v[`snd_${id}`] = a.sound;
+    v[`name_${id}`] = `${a.name}!`;
     for (const [fid, f] of Object.entries(FRUITS))
       v[`want_${id}_${fid}`] = `${a.name} хочет ${f.acc}!`;
   }

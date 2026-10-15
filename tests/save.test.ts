@@ -38,6 +38,7 @@ describe('save', () => {
     expect(p.osman.car).toBe('police');
     expect(p.osman.cups).toEqual({ city: 1, forest: 0, desert: 0 });
     expect(p.safia).toEqual({ fed: 0, parties: 0 });
+    expect(p.umar).toEqual({ rides: 0 });
   });
 
   it('replaces an old colour choice with the race car', () => {

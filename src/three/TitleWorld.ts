@@ -2,17 +2,24 @@ import * as THREE from 'three';
 import { Pet, fruit, model, wheels } from './models';
 import { skyTexture } from './stage';
 
-const CAR_CENTER = new THREE.Vector3(-3.3, 0.45, 0.6);
-const CAR_RADIUS = 2;
-const BUNNY_POS = new THREE.Vector3(3.2, 0.4, 0.8);
+const CAR_CENTER = new THREE.Vector3(-4.6, 0.45, 0.9);
+const CAR_RADIUS = 1.6;
+const BUNNY_POS = new THREE.Vector3(0, 0.4, 1.4);
+const TRACTOR_CENTER = new THREE.Vector3(4.6, 0.45, 0.9);
+const TRACTOR_RADIUS = 1.5;
 
-/** Start screen: a floating island with Осман's car racing in circles and Сафия's bunny dancing. */
+/**
+ * Start screen: a floating island with Осман's car racing in circles, Сафия's bunny dancing
+ * among fruits, and Умар's blue tractor driving round a fenced field.
+ */
 export class TitleWorld {
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(40, 16 / 9, 0.1, 200);
   private readonly island = new THREE.Group();
   private readonly car: THREE.Object3D;
   private readonly carWheels: THREE.Object3D[];
+  private readonly tractor: THREE.Object3D;
+  private readonly tractorWheels: THREE.Object3D[];
   private readonly bunny: Pet;
   private readonly clouds: THREE.Object3D[] = [];
   private t = 0;
@@ -29,17 +36,17 @@ export class TitleWorld {
     s.add(sun);
 
     const top = new THREE.Mesh(
-      new THREE.CylinderGeometry(7.2, 6.8, 0.8, 48),
+      new THREE.CylinderGeometry(8, 7.6, 0.8, 48),
       new THREE.MeshStandardMaterial({ color: 0x74c95a, roughness: 1 }),
     );
     top.receiveShadow = true;
     const dirt = new THREE.Mesh(
-      new THREE.CylinderGeometry(6.8, 5.6, 1.4, 48),
+      new THREE.CylinderGeometry(7.6, 6.2, 1.4, 48),
       new THREE.MeshStandardMaterial({ color: 0xa87a4f, roughness: 1 }),
     );
     dirt.position.y = -1.1;
     const rock = new THREE.Mesh(
-      new THREE.ConeGeometry(5.6, 5, 9),
+      new THREE.ConeGeometry(6.2, 5, 9),
       new THREE.MeshStandardMaterial({ color: 0x8c7a6b, flatShading: true }),
     );
     rock.rotation.x = Math.PI;
@@ -59,15 +66,15 @@ export class TitleWorld {
     this.island.add(track);
     for (let i = 0; i < 6; i++) {
       const a = (i / 6) * Math.PI * 2;
-      const cone = model('cone', 0.9);
+      const cone = model('cone', 0.8);
       cone.position.set(
-        CAR_CENTER.x + Math.cos(a) * (CAR_RADIUS + 1.25),
+        CAR_CENTER.x + Math.cos(a) * (CAR_RADIUS + 1.1),
         0.4,
-        CAR_CENTER.z + Math.sin(a) * (CAR_RADIUS + 1.25),
+        CAR_CENTER.z + Math.sin(a) * (CAR_RADIUS + 1.1),
       );
       this.island.add(cone);
     }
-    this.car = model(carName, 0.75);
+    this.car = model(carName, 0.7);
     this.island.add(this.car);
     this.carWheels = wheels(this.car);
 
@@ -77,11 +84,11 @@ export class TitleWorld {
     void this.bunny.play('dance');
     this.island.add(this.bunny.obj);
     const fruits: [string, number, number, number][] = [
-      ['apple', 4.9, 0.4, 1.5],
-      ['banana', 5.3, 0.4, 0.6],
-      ['strawberry', 4.6, 0.4, 0.3],
-      ['watermelon', 1.6, 0.4, 1.7],
-      ['carrot', 1.9, 0.4, 0.4],
+      ['apple', -1.5, 0.4, 2.2],
+      ['banana', 1.6, 0.4, 2.3],
+      ['strawberry', -1.3, 0.4, 0.5],
+      ['watermelon', 1.4, 0.4, 0.4],
+      ['carrot', 0.1, 0.4, 3.1],
     ];
     for (const [name, x, y, z] of fruits) {
       const f = fruit(name, 0.75);
@@ -89,12 +96,45 @@ export class TitleWorld {
       this.island.add(f);
     }
 
+    // Умар's side: dirt track round a fenced field with hay, and the blue tractor
+    const dirt2 = new THREE.Mesh(
+      new THREE.RingGeometry(TRACTOR_RADIUS - 0.7, TRACTOR_RADIUS + 0.7, 48),
+      new THREE.MeshStandardMaterial({ color: 0xc99a62 }),
+    );
+    dirt2.rotation.x = -Math.PI / 2;
+    dirt2.position.set(TRACTOR_CENTER.x, 0.42, TRACTOR_CENTER.z);
+    dirt2.receiveShadow = true;
+    this.island.add(dirt2);
+    const wood = new THREE.MeshStandardMaterial({ color: 0xc58a4e });
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.7, 0.16), wood);
+      post.position.set(
+        TRACTOR_CENTER.x + Math.cos(a) * (TRACTOR_RADIUS + 1.05),
+        0.75,
+        TRACTOR_CENTER.z + Math.sin(a) * (TRACTOR_RADIUS + 1.05),
+      );
+      post.castShadow = true;
+      this.island.add(post);
+    }
+    const hay = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.45, 0.45, 0.7, 16),
+      new THREE.MeshStandardMaterial({ color: 0xf2c94c }),
+    );
+    hay.rotation.z = Math.PI / 2;
+    hay.position.set(TRACTOR_CENTER.x, 0.85, TRACTOR_CENTER.z);
+    hay.castShadow = true;
+    this.island.add(hay);
+    this.tractor = model('tractor', 0.75);
+    this.island.add(this.tractor);
+    this.tractorWheels = wheels(this.tractor);
+
     for (const [x, z, sc, name] of [
-      [-5.5, -3.5, 3.2, 'treeLarge'],
-      [-1, -4.6, 2.6, 'treeSmall'],
-      [2.2, -4.2, 3.4, 'treeLarge'],
-      [5.6, -2.6, 2.8, 'treeSmall'],
-      [0.2, -2.6, 2.2, 'treeSmall'],
+      [-6, -4, 3.2, 'treeLarge'],
+      [-2.2, -4.6, 2.6, 'treeSmall'],
+      [2, -4.4, 3.4, 'treeLarge'],
+      [6.2, -3.4, 2.8, 'treeSmall'],
+      [0.3, -2.4, 2.2, 'treeSmall'],
     ] as const) {
       const tree = model(name, sc);
       tree.position.set(x, 0.4, z);
@@ -126,8 +166,8 @@ export class TitleWorld {
       this.clouds.push(c);
     }
 
-    this.camera.position.set(0, 7.5, 15.5);
-    this.camera.lookAt(0, -0.2, 0);
+    this.camera.position.set(0, 8.2, 17.5);
+    this.camera.lookAt(0, -0.4, 0);
   }
 
   /** Centre of each side (tap zones and name plates). */
@@ -139,6 +179,10 @@ export class TitleWorld {
     return BUNNY_POS.clone()
       .add(this.island.position)
       .add(new THREE.Vector3(0, 1.2, 0));
+  }
+
+  tractorSpot(): THREE.Vector3 {
+    return TRACTOR_CENTER.clone().add(this.island.position);
   }
 
   update(dt: number): void {
@@ -153,6 +197,15 @@ export class TitleWorld {
     // heading follows the tangent of the circle (cars face +Z)
     this.car.rotation.y = -a;
     for (const w of this.carWheels) w.rotation.x += dt * 10;
+    // the tractor goes round the other way, slower
+    const b = -this.t * 0.7;
+    this.tractor.position.set(
+      TRACTOR_CENTER.x + Math.cos(b) * TRACTOR_RADIUS,
+      0.42,
+      TRACTOR_CENTER.z + Math.sin(b) * TRACTOR_RADIUS,
+    );
+    this.tractor.rotation.y = -b + Math.PI;
+    for (const w of this.tractorWheels) w.rotation.x += dt * 5;
     this.bunny.update(dt);
     this.clouds.forEach((c, i) => (c.position.x += Math.sin(this.t * 0.2 + i) * dt * 0.3));
   }

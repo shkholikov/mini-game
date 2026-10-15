@@ -5,7 +5,7 @@ import { loadModels } from '../three/models';
 import { makeThumbs } from '../three/thumbs';
 import { COLOR, gameText, gradientFill, makeTextures } from '../ui';
 
-const SFX = ['correct', 'tap', 'pop', 'coin', 'soft', 'whoosh', 'drop'];
+const SFX = ['correct', 'tap', 'pop', 'coin', 'soft', 'whoosh', 'drop', 'horn'];
 /** 2D race art still used: countdown lights and the land tiles on the garage track cards. */
 const RACE = ['lights', 'land_grass', 'land_sand'];
 const ICONS = ['home', 'return', 'right', 'star', 'trophy', 'tablet', 'musicOn', 'musicOff'];

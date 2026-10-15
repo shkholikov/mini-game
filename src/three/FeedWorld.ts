@@ -393,14 +393,14 @@ export class FeedWorld {
   }
 }
 
-function canvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
+export function canvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
   return [c, c.getContext('2d')!];
 }
 
-function grassTexture(): THREE.CanvasTexture {
+export function grassTexture(): THREE.CanvasTexture {
   const [c, ctx] = canvas(256, 256);
   ctx.fillStyle = '#74c95a';
   ctx.fillRect(0, 0, 256, 256);

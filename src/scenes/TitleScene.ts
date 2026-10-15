@@ -13,13 +13,16 @@ interface Side {
   button: Phaser.GameObjects.Container;
 }
 
+/** Distance between the three name buttons. */
+const BUTTON_GAP = 420;
+
 /** Shown once per visit: the Play tap unlocks sound and enters fullscreen. */
 let started = false;
 
-/** Floating 3D island: a Play screen first, then tap Осман's car or Сафия's bunny. */
+/** Floating 3D island: a Play screen first, then tap Осман's car, Сафия's bunny or Умар's tractor. */
 export class TitleScene extends Phaser.Scene {
   private world!: TitleWorld;
-  private sides: { osman?: Side; safia?: Side } = {};
+  private sides: { osman?: Side; safia?: Side; umar?: Side } = {};
   private chosen = false;
 
   constructor() {
@@ -65,7 +68,7 @@ export class TitleScene extends Phaser.Scene {
     const c = this.add.container(GAME_WIDTH / 2, 300).setDepth(20);
     const style = {
       fontFamily: FONT.race,
-      fontSize: '120px',
+      fontSize: '100px',
       color: '#ffffff',
       padding: { x: 6, y: 10 },
     };
@@ -78,7 +81,7 @@ export class TitleScene extends Phaser.Scene {
       t.setFill(g);
       return t;
     });
-    const widths = letters.map((t) => (t.text === ' ' ? 34 : t.width - 18));
+    const widths = letters.map((t) => (t.text === ' ' ? 30 : t.width - 16));
     let x = -widths.reduce((a, b) => a + b, 0) / 2;
     letters.forEach((t, i) => {
       t.x = x + widths[i]! / 2;
@@ -156,10 +159,14 @@ export class TitleScene extends Phaser.Scene {
         this.scene.start('Feed');
       },
     );
+    this.sides.umar = this.side(TEXT.umar, COLOR.blue, 'thumb_tractor', 0.5, '', 0, 0, () => {
+      void voice().say('hi_umar');
+      this.scene.start('Tractor');
+    });
     void voice().say('who_plays');
   }
 
-  /** Big toy button with the kid's name, plus a tap zone over that half of the island. */
+  /** Big toy button with the kid's name, plus a tap zone over that kid's part of the island. */
   private side(
     name: string,
     color: number,
@@ -176,20 +183,20 @@ export class TitleScene extends Phaser.Scene {
       onTap();
     };
     const button = candyButton(this, 0, 0, {
-      width: 400,
+      width: 370,
       height: 130,
       color,
       image,
       imageScale,
       label: name,
-      fontSize: 60,
+      fontSize: 58,
       onTap: go,
     });
     button.setDepth(25).setScale(0);
-    if (count > 0) button.add(sticker(this, 185, -62, stickerIcon, count, stickerScale));
+    if (count > 0) button.add(sticker(this, 170, -62, stickerIcon, count, stickerScale));
     this.tweens.add({ targets: button, scale: 1, duration: 500, ease: 'Back.out' });
 
-    const zone = this.add.zone(0, 0, 560, 480).setInteractive({ useHandCursor: true });
+    const zone = this.add.zone(0, 0, 400, 440).setInteractive({ useHandCursor: true });
     zone.on('pointerdown', () => {
       voice().sfx('tap');
       go();
@@ -200,17 +207,23 @@ export class TitleScene extends Phaser.Scene {
   update(_time: number, deltaMs: number): void {
     this.world.update(Math.min(deltaMs, 50) / 1000);
     const stage = getStage();
-    const place = (side: Side | undefined, spot: Parameters<typeof stage.toGame>[0]): void => {
+    // zones follow the 3D spots; the buttons sit in three fixed columns so they never overlap
+    const place = (
+      side: Side | undefined,
+      spot: Parameters<typeof stage.toGame>[0],
+      column: number,
+    ): void => {
       if (!side) return;
       const s = stage.toGame(spot, this.game.canvas, GAME_WIDTH, GAME_HEIGHT);
       side.zone.setPosition(s.x, s.y);
       side.button.setPosition(
-        s.x,
-        Math.min(s.y + 250, GAME_HEIGHT - 100) + Math.sin(this.time.now / 450) * 6,
+        GAME_WIDTH / 2 + column * BUTTON_GAP,
+        GAME_HEIGHT - 110 + Math.sin(this.time.now / 450 + column) * 6,
       );
     };
-    place(this.sides.osman, this.world.carSpot());
-    place(this.sides.safia, this.world.bunnySpot());
+    place(this.sides.osman, this.world.carSpot(), -1);
+    place(this.sides.safia, this.world.bunnySpot(), 0);
+    place(this.sides.umar, this.world.tractorSpot(), 1);
     stage.render();
   }
 }
