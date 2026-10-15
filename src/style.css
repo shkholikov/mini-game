@@ -14,8 +14,23 @@ body {
 }
 
 #game {
+  position: relative;
   width: 100%;
   height: 100%;
+}
+
+/* Three.js world sits behind the transparent Phaser canvas (HUD, buttons, input). */
+#stage3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+#game canvas:not(#stage3d) {
+  position: relative;
+  z-index: 1;
 }
 
 /* Portrait: hide the game and show a rotating tablet (no text — kids can't read). */

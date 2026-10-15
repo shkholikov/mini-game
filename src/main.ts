@@ -15,7 +15,8 @@ void navigator.storage?.persist?.().catch(() => undefined);
 const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  backgroundColor: '#8fd3ff',
+  // Transparent so the Three.js canvas behind it shows through in the 3D screens.
+  transparent: true,
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,

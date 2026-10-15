@@ -31,12 +31,12 @@ export const FRUITS = {
   carrot: { nom: 'Морковка', acc: 'морковку' },
 } as const;
 
-export const CAR_COLORS = {
-  red: 'Красная машина!',
-  blue: 'Синяя машина!',
-  green: 'Зелёная машина!',
-  yellow: 'Жёлтая машина!',
-  black: 'Чёрная машина!',
+export const CAR_MODELS = {
+  race: 'Гоночная машина!',
+  police: 'Полиция! Виу-виу!',
+  firetruck: 'Пожарная машина!',
+  ambulance: 'Скорая помощь!',
+  taxi: 'Такси!',
 } as const;
 
 export const TRACKS = {
@@ -47,7 +47,7 @@ export const TRACKS = {
 
 export type AnimalId = keyof typeof ANIMALS;
 export type FruitId = keyof typeof FRUITS;
-export type CarColor = keyof typeof CAR_COLORS;
+export type CarModel = keyof typeof CAR_MODELS;
 export type TrackId = keyof typeof TRACKS;
 
 const NUMBERS = [
@@ -113,7 +113,7 @@ function build(): Record<string, string> {
       v[`want_${id}_${fid}`] = `${a.name} хочет ${f.acc}!`;
   }
   for (const [id, f] of Object.entries(FRUITS)) v[`fruit_${id}`] = `${f.nom}!`;
-  for (const [id, t] of Object.entries(CAR_COLORS)) v[`car_${id}`] = t;
+  for (const [id, t] of Object.entries(CAR_MODELS)) v[`car_${id}`] = t;
   for (const [id, t] of Object.entries(TRACKS)) v[`track_${id}`] = t;
   return v;
 }

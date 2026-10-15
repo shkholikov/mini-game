@@ -18,10 +18,14 @@ export interface Spawn {
 
 export interface TrackDef {
   id: TrackId;
+  /** 2D tile for the garage track card */
   land: string;
   road: number;
+  ground: number;
+  sky: [string, string];
   length: number;
   obstacles: ObstacleKind[];
+  /** 3D roadside models ('rock' is made in code) */
   decor: string[];
 }
 
@@ -29,26 +33,40 @@ export const TRACKS: Record<TrackId, TrackDef> = {
   city: {
     id: 'city',
     land: 'land_grass',
-    road: 0x6f7377,
+    road: 0x5d6166,
+    ground: 0x63b95a,
+    sky: ['#5fb8ff', '#dff3ff'],
     length: 15000,
     obstacles: ['cone_straight', 'barrel_red', 'barrel_blue'],
-    decor: ['tree_large', 'tree_small', 'tribune_full', 'tent_red'],
+    decor: [
+      'treeSmall',
+      'treeLarge',
+      'lightPostLarge',
+      'grandStand',
+      'billboard',
+      'bannerTowerRed',
+      'treeSmall',
+    ],
   },
   forest: {
     id: 'forest',
     land: 'land_grass',
-    road: 0x9a7048,
+    road: 0x8a6542,
+    ground: 0x3e8f43,
+    sky: ['#7fc8ff', '#e6f6e0'],
     length: 19000,
     obstacles: ['tires_red', 'oil', 'cone_straight'],
-    decor: ['tree_large', 'tree_large', 'tree_small', 'tent_blue'],
+    decor: ['treeLarge', 'treeLarge', 'treeSmall', 'tent'],
   },
   desert: {
     id: 'desert',
     land: 'land_sand',
-    road: 0xc9a46a,
+    road: 0xa67c4e,
+    ground: 0xe0bf7a,
+    sky: ['#ffb36b', '#fff1c9'],
     length: 23000,
     obstacles: ['rock1', 'barrel_red', 'tires_red'],
-    decor: ['rock2', 'rock1', 'tent_red', 'tree_small'],
+    decor: ['rock', 'rock', 'tent', 'bannerTowerGreen'],
   },
 };
 

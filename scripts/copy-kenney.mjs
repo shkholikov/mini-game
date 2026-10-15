@@ -1,4 +1,5 @@
-// Copies the Kenney CC0 files the game uses into public/assets.
+// Copies the Kenney CC0 2D files the game uses into public/assets.
+// (3D models in public/assets/3d come from Kenney Car Kit and Racing Kit, copied by hand.)
 // Usage: node scripts/copy-kenney.mjs <dir-with-unzipped-kenney-packs>
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync } from 'node:fs';
@@ -17,32 +18,9 @@ const copy = (from, to) => {
 };
 
 const racing = 'kenney_racing-pack/PNG';
-for (const color of ['red', 'blue', 'green', 'yellow', 'black']) {
-  for (const n of [1, 2, 3, 4, 5])
-    copy(`${racing}/Cars/car_${color}_${n}.png`, `cars/car_${color}_${n}.png`);
-}
-for (const o of [
-  'cone_straight',
-  'barrel_red',
-  'barrel_blue',
-  'tires_red',
-  'tires_white',
-  'arrow_yellow',
-  'tree_large',
-  'tree_small',
-  'tribune_full',
-  'tent_red',
-  'tent_blue',
-  'oil',
-  'rock1',
-  'rock2',
-  'lights',
-]) {
-  copy(`${racing}/Objects/${o}.png`, `race/${o}.png`);
-}
+copy(`${racing}/Objects/lights.png`, 'race/lights.png');
 copy(`${racing}/Tiles/Grass/land_grass04.png`, 'race/land_grass.png');
 copy(`${racing}/Tiles/Sand/land_sand04.png`, 'race/land_sand.png');
-copy(`${racing}/Tiles/Dirt/land_dirt04.png`, 'race/land_dirt.png');
 copy('kenney_racing-pack/License.txt', 'LICENSE-kenney-racing.txt');
 
 for (const a of [

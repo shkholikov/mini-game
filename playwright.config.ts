@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: 'e2e',
+  // WebGL in headless Chromium is software-rendered; one browser at a time keeps timings stable.
+  workers: 1,
   use: { baseURL: 'http://localhost:4173' },
   webServer: {
     command: 'pnpm build && pnpm preview --port 4173 --strictPort',

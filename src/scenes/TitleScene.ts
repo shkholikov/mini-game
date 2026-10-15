@@ -31,7 +31,7 @@ export class TitleScene extends Phaser.Scene {
       0xff8a3d,
       TEXT.osman,
       (c) => {
-        const car = this.add.image(0, -30, `car_${p.osman.car}_1`).setScale(2.2).setAngle(90);
+        const car = this.add.image(0, -40, `thumb_${p.osman.car}`).setScale(1.6);
         c.add(car);
         this.tweens.add({
           targets: car,

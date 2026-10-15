@@ -1,0 +1,91 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+/** Car Kit models (cars face +Z, ~2.5 units long). */
+export const PLAYER_CARS = ['race', 'police', 'firetruck', 'ambulance', 'taxi'] as const;
+export type PlayerCar = (typeof PLAYER_CARS)[number];
+export const RIVAL_CARS = ['sedan', 'suv', 'van', 'truck', 'delivery', 'hatchback-sports'] as const;
+const PROPS = ['cone', 'box', 'debris-tire'] as const;
+/** Racing Kit pieces (1 unit grid, scaled up in the world). */
+const TRACK = [
+  'grandStand',
+  'tent',
+  'treeLarge',
+  'treeSmall',
+  'lightPostLarge',
+  'billboard',
+  'flagCheckers',
+  'overheadLights',
+  'barrierRed',
+  'barrierWhite',
+  'pylon',
+  'bannerTowerRed',
+  'bannerTowerGreen',
+] as const;
+
+const cache = new Map<string, THREE.Object3D>();
+let loading: Promise<void> | null = null;
+
+/** Loads every model once. Missing files only warn, so the race still runs. */
+export function loadModels(onProgress?: (v: number) => void): Promise<void> {
+  if (loading) return loading;
+  const loader = new GLTFLoader();
+  const jobs = [
+    ...[...PLAYER_CARS, ...RIVAL_CARS, ...PROPS].map(
+      (n) => [n, `assets/3d/cars/${n}.glb`] as const,
+    ),
+    ...TRACK.map((n) => [n, `assets/3d/track/${n}.glb`] as const),
+  ];
+  let done = 0;
+  loading = Promise.all(
+    jobs.map(([name, url]) =>
+      loader
+        .loadAsync(url)
+        .then((gltf) => {
+          gltf.scene.traverse((o) => {
+            if (o instanceof THREE.Mesh) {
+              o.castShadow = true;
+              o.receiveShadow = true;
+              o.userData.shared = true;
+            }
+          });
+          cache.set(name, normalize(gltf.scene));
+        })
+        .catch((e) => console.warn(`[models] could not load ${url}`, e))
+        .finally(() => onProgress?.(++done / jobs.length)),
+    ),
+  ).then(() => undefined);
+  return loading;
+}
+
+/** Wraps a model so its footprint is centred on x/z and it stands on y = 0. */
+function normalize(root: THREE.Object3D): THREE.Object3D {
+  const box = new THREE.Box3().setFromObject(root);
+  const center = box.getCenter(new THREE.Vector3());
+  root.position.sub(new THREE.Vector3(center.x, box.min.y, center.z));
+  const wrap = new THREE.Group();
+  wrap.add(root);
+  return wrap;
+}
+
+/** A fresh copy of a model (geometry and materials are shared), or a grey box if it failed to load. */
+export function model(name: string, scale = 1): THREE.Object3D {
+  const src = cache.get(name);
+  const obj = src
+    ? src.clone(true)
+    : new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshStandardMaterial({ color: 0x999999 }),
+      );
+  obj.scale.setScalar(scale);
+  return obj;
+}
+
+/** Wheel meshes of a car model (named wheel-*), to spin them. */
+export function wheels(car: THREE.Object3D): THREE.Object3D[] {
+  const out: THREE.Object3D[] = [];
+  car.traverse((o) => {
+    if (o.name.startsWith('wheel')) out.push(o);
+  });
+  return out;
+}

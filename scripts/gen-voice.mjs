@@ -1,7 +1,7 @@
 // Generates Russian voice files from src/i18n/ru.ts with macOS `say` (voice Milena) + ffmpeg.
 // Only re-generates lines whose text changed (manifest in public/assets/voice/manifest.json).
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { VOICE } from '../src/i18n/ru.ts';
@@ -36,5 +36,13 @@ for (const [id, text] of Object.entries(VOICE)) {
   made++;
 }
 rmSync(tmp, { force: true });
+// Drop lines that no longer exist.
+for (const f of readdirSync(out)) {
+  const id = f.replace(/\.mp3$/, '');
+  if (f.endsWith('.mp3') && !(id in VOICE)) {
+    rmSync(join(out, f));
+    delete manifest[id];
+  }
+}
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 console.log(`voice: ${made} generated, ${Object.keys(VOICE).length} total`);

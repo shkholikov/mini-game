@@ -145,12 +145,12 @@
   "fruit_watermelon": "Арбуз!",
   "fruit_cherries": "Вишня!",
   "fruit_carrot": "Морковка!",
-  "car_red": "Красная машина!",
-  "car_blue": "Синяя машина!",
-  "car_green": "Зелёная машина!",
-  "car_yellow": "Жёлтая машина!",
-  "car_black": "Чёрная машина!",
   "track_city": "Городская трасса!",
   "track_forest": "Лесная трасса!",
-  "track_desert": "Пустыня!"
+  "track_desert": "Пустыня!",
+  "car_race": "Гоночная машина!",
+  "car_police": "Полиция! Виу-виу!",
+  "car_firetruck": "Пожарная машина!",
+  "car_ambulance": "Скорая помощь!",
+  "car_taxi": "Такси!"
 }

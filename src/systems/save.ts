@@ -1,10 +1,10 @@
-import type { CarColor, TrackId } from '../i18n/ru';
+import { CAR_MODELS, type CarModel, type TrackId } from '../i18n/ru';
 
 export interface Progress {
   version: 1;
   safia: { fed: number; parties: number };
   osman: {
-    car: CarColor;
+    car: CarModel;
     races: number;
     cups: Record<TrackId, number>;
     bestStars: Record<TrackId, number>;
@@ -23,7 +23,7 @@ export function defaultProgress(): Progress {
     version: 1,
     safia: { fed: 0, parties: 0 },
     osman: {
-      car: 'red',
+      car: 'race',
       races: 0,
       cups: { city: 0, forest: 0, desert: 0 },
       bestStars: { city: 0, forest: 0, desert: 0 },
@@ -40,6 +40,8 @@ function merge(raw: Partial<Progress>): Progress {
     osman: {
       ...d.osman,
       ...raw.osman,
+      // Cars used to be colours; anything unknown falls back to the race car.
+      car: raw.osman?.car && raw.osman.car in CAR_MODELS ? raw.osman.car : d.osman.car,
       cups: { ...d.osman.cups, ...raw.osman?.cups },
       bestStars: { ...d.osman.bestStars, ...raw.osman?.bestStars },
     },
