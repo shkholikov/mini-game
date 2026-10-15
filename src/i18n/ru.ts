@@ -7,15 +7,16 @@ export const TEXT = {
 } as const;
 
 export const ANIMALS = {
-  rabbit: { name: 'Зайчик', sound: 'Хрум-хрум!' },
+  cow: { name: 'Коровка', sound: 'Му-у-у!' },
+  chick: { name: 'Цыплёнок', sound: 'Пи-пи-пи!' },
+  cat: { name: 'Котик', sound: 'Мяу!' },
+  dog: { name: 'Собачка', sound: 'Гав-гав!' },
+  bunny: { name: 'Зайчик', sound: 'Хрум-хрум!' },
   monkey: { name: 'Обезьянка', sound: 'У-у-а-а!' },
   panda: { name: 'Панда', sound: 'Ням-ням!' },
   elephant: { name: 'Слоник', sound: 'Ту-ру-ру!' },
-  giraffe: { name: 'Жираф', sound: 'Ммм, вкусно!' },
-  parrot: { name: 'Попугай', sound: 'Привет! Привет!' },
-  penguin: { name: 'Пингвин', sound: 'Буль-буль!' },
   pig: { name: 'Хрюшка', sound: 'Хрю-хрю!' },
-  hippo: { name: 'Бегемотик', sound: 'Ам-ам!' },
+  giraffe: { name: 'Жираф', sound: 'Ммм, вкусно!' },
 } as const;
 
 /** nom = "Это …", acc = "… хочет …" */

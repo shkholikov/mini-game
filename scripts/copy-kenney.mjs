@@ -1,5 +1,5 @@
 // Copies the Kenney CC0 2D files the game uses into public/assets.
-// (3D models in public/assets/3d come from Kenney Car Kit and Racing Kit, copied by hand.)
+// (3D models in public/assets/3d come from Kenney Car Kit, Racing Kit, Cube Pets and Food Kit, copied by hand.)
 // Usage: node scripts/copy-kenney.mjs <dir-with-unzipped-kenney-packs>
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync } from 'node:fs';
@@ -22,21 +22,6 @@ copy(`${racing}/Objects/lights.png`, 'race/lights.png');
 copy(`${racing}/Tiles/Grass/land_grass04.png`, 'race/land_grass.png');
 copy(`${racing}/Tiles/Sand/land_sand04.png`, 'race/land_sand.png');
 copy('kenney_racing-pack/License.txt', 'LICENSE-kenney-racing.txt');
-
-for (const a of [
-  'elephant',
-  'giraffe',
-  'hippo',
-  'monkey',
-  'panda',
-  'parrot',
-  'penguin',
-  'pig',
-  'rabbit',
-]) {
-  copy(`kenney_animal-pack/PNG/Round/${a}.png`, `animals/${a}.png`);
-}
-copy('kenney_animal-pack/License.txt', 'LICENSE-kenney-animals.txt');
 
 // Interface sounds → mp3 (ogg is not reliable on older iPads)
 const sounds = {

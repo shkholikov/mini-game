@@ -5,7 +5,7 @@ export const ANIMAL_IDS = Object.keys(ANIMALS) as AnimalId[];
 export const FRUIT_IDS = Object.keys(FRUITS) as FruitId[];
 
 /** Animals that always want their "own" food, so the game teaches the classic pairs. */
-export const SIGNATURE: Partial<Record<AnimalId, FruitId>> = { rabbit: 'carrot', monkey: 'banana' };
+export const SIGNATURE: Partial<Record<AnimalId, FruitId>> = { bunny: 'carrot', monkey: 'banana' };
 
 export const ANIMALS_PER_PARTY = 5;
 

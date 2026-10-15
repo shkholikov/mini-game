@@ -24,9 +24,9 @@ describe('feedLogic', () => {
   it('keeps the classic pairs', () => {
     for (let seed = 1; seed < 50; seed++) {
       for (const r of makeParty(createRng(seed))) {
-        if (r.animal === 'rabbit') expect(r.want).toBe('carrot');
+        if (r.animal === 'bunny') expect(r.want).toBe('carrot');
         if (r.animal === 'monkey') expect(r.want).toBe('banana');
-        if (r.animal !== 'rabbit') expect(r.want).not.toBe('carrot');
+        if (r.animal !== 'bunny') expect(r.want).not.toBe('carrot');
       }
     }
   });

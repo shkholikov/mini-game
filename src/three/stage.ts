@@ -77,6 +77,28 @@ export class Stage {
   }
 }
 
+/** Ray from the camera through a point given in Phaser game coordinates. */
+export function rayFromGame(
+  stage: Stage,
+  x: number,
+  y: number,
+  phaserCanvas: HTMLCanvasElement,
+  gameW: number,
+  gameH: number,
+): THREE.Raycaster {
+  const rp = phaserCanvas.getBoundingClientRect();
+  const clientX = rp.left + (x / gameW) * rp.width;
+  const clientY = rp.top + (y / gameH) * rp.height;
+  const r3 = stage.canvas.getBoundingClientRect();
+  const ndc = new THREE.Vector2(
+    ((clientX - r3.left) / r3.width) * 2 - 1,
+    -(((clientY - r3.top) / r3.height) * 2 - 1),
+  );
+  const ray = new THREE.Raycaster();
+  ray.setFromCamera(ndc, stage.camera);
+  return ray;
+}
+
 /** Frees per-screen geometry and materials; shared model geometry is flagged and kept. */
 function disposeScene(scene: THREE.Scene): void {
   scene.traverse((o) => {

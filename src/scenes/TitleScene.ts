@@ -1,19 +1,36 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH } from '../config/game';
+import { GAME_HEIGHT, GAME_WIDTH } from '../config/game';
 import { TEXT } from '../i18n/ru';
-import { save } from '../systems/services';
 import { totalCups } from '../systems/save';
+import { save } from '../systems/services';
 import { voice } from '../systems/voice';
-import { FONT, INK, drawMeadow } from '../ui';
+import { getStage } from '../three/stage';
+import { TitleWorld } from '../three/TitleWorld';
+import { FONT } from '../ui';
 
+interface Side {
+  zone: Phaser.GameObjects.Zone;
+  plate: Phaser.GameObjects.Container;
+}
+
+/** Floating 3D island: tap Осман's racing car or Сафия's bunny. */
 export class TitleScene extends Phaser.Scene {
+  private world!: TitleWorld;
+  private osman!: Side;
+  private safia!: Side;
+  private chosen = false;
+
   constructor() {
     super('Title');
   }
 
   create(): void {
-    drawMeadow(this);
+    this.chosen = false;
     const p = save.get();
+    this.world = new TitleWorld(p.osman.car);
+    const stage = getStage();
+    stage.show(this.world.scene, this.world.camera);
+    this.events.once('shutdown', () => stage.hide());
 
     this.add
       .text(GAME_WIDTH / 2, 90, TEXT.title, {
@@ -25,112 +42,85 @@ export class TitleScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setStroke('#2f3b52', 14);
 
-    this.card(
-      520,
-      470,
-      0xff8a3d,
-      TEXT.osman,
-      (c) => {
-        const car = this.add.image(0, -40, `thumb_${p.osman.car}`).setScale(1.6);
-        c.add(car);
-        this.tweens.add({
-          targets: car,
-          x: 20,
-          duration: 600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.inOut',
-        });
-        this.badge(c, 'cup', totalCups(p), 0.42);
-      },
-      () => {
-        voice().say('hi_osman');
-        this.scene.start('Garage');
-      },
-    );
+    this.osman = this.side(TEXT.osman, 0xff8a3d, 'cup', totalCups(p), 0.42, () => {
+      void voice().say('hi_osman');
+      this.scene.start('Garage');
+    });
+    this.safia = this.side(TEXT.safia, 0xf06aa0, 'heart', p.safia.fed, 0.9, () => {
+      void voice().say('hi_safia');
+      this.scene.start('Feed');
+    });
 
-    this.card(
-      1080,
-      470,
-      0xf06aa0,
-      TEXT.safia,
-      (c) => {
-        const rabbit = this.add.image(-40, -40, 'animal_rabbit').setScale(0.75);
-        const apple = this.add.image(90, 20, 'fruit_apple').setScale(0.32);
-        c.add([rabbit, apple]);
-        this.tweens.add({
-          targets: rabbit,
-          y: -60,
-          duration: 500,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.inOut',
-        });
-        this.badge(c, 'heart', p.safia.fed, 0.9);
-      },
-      () => {
-        voice().say('hi_safia');
-        this.scene.start('Feed');
-      },
-    );
-
-    voice().say('who_plays');
+    void voice().say('who_plays');
   }
 
-  private card(
-    x: number,
-    y: number,
-    color: number,
+  /** Name plate with an optional score badge, plus a big tap zone over that half of the island. */
+  private side(
     name: string,
-    fill: (c: Phaser.GameObjects.Container) => void,
+    color: number,
+    icon: string,
+    count: number,
+    iconScale: number,
     onTap: () => void,
-  ): void {
-    const c = this.add.container(x, y);
-    c.add(this.add.rectangle(0, 12, 480, 540, 0x000000, 0.15).setRounded(48));
-    c.add(this.add.rectangle(0, 0, 480, 540, color).setRounded(48).setStrokeStyle(10, 0xffffff));
-    c.add(
+  ): Side {
+    const plate = this.add.container(0, 0).setDepth(10);
+    const label = this.add
+      .text(0, 0, name, { fontFamily: FONT, fontSize: '56px', fontStyle: 'bold', color: '#ffffff' })
+      .setOrigin(0.5);
+    plate.add([
+      this.add.rectangle(0, 6, label.width + 70, 96, 0x000000, 0.2).setRounded(48),
       this.add
-        .text(0, 200, name, {
-          fontFamily: FONT,
-          fontSize: '64px',
-          fontStyle: 'bold',
-          color: '#ffffff',
-        })
-        .setOrigin(0.5)
-        .setStroke('#2f3b52', 10),
-    );
-    fill(c);
-    c.setSize(480, 540).setInteractive({ useHandCursor: true });
-    this.tweens.add({
-      targets: c,
-      angle: { from: -1.5, to: 1.5 },
-      duration: 1400,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.inOut',
-    });
-    let used = false;
-    c.on('pointerdown', () => {
-      if (used) return;
-      used = true;
+        .rectangle(0, 0, label.width + 70, 96, color)
+        .setRounded(48)
+        .setStrokeStyle(8, 0xffffff),
+      label,
+    ]);
+    if (count > 0) {
+      const bx = label.width / 2 + 60;
+      plate.add([
+        this.add.circle(bx, -40, 46, 0xffffff),
+        this.add.image(bx, -50, icon).setScale(iconScale * 0.8),
+        this.add
+          .text(bx, -14, String(count), {
+            fontFamily: FONT,
+            fontSize: '28px',
+            fontStyle: 'bold',
+            color: '#2f3b52',
+          })
+          .setOrigin(0.5),
+      ]);
+    }
+
+    const zone = this.add.zone(0, 0, 560, 520).setInteractive({ useHandCursor: true });
+    zone.on('pointerdown', () => {
+      if (this.chosen) return;
+      this.chosen = true;
       voice().sfx('tap');
-      this.tweens.add({ targets: c, scale: 0.92, duration: 90, yoyo: true, onComplete: onTap });
+      this.tweens.add({
+        targets: plate,
+        scale: 1.15,
+        duration: 120,
+        yoyo: true,
+        onComplete: onTap,
+      });
     });
+    return { zone, plate };
   }
 
-  private badge(c: Phaser.GameObjects.Container, icon: string, count: number, scale: number): void {
-    if (count <= 0) return;
-    c.add(this.add.circle(160, -210, 58, 0xffffff));
-    c.add(this.add.image(160, -222, icon).setScale(scale));
-    c.add(
-      this.add
-        .text(160, -176, String(count), {
-          fontFamily: FONT,
-          fontSize: '34px',
-          fontStyle: 'bold',
-          color: '#' + INK.toString(16),
-        })
-        .setOrigin(0.5),
-    );
+  update(_time: number, deltaMs: number): void {
+    this.world.update(Math.min(deltaMs, 50) / 1000);
+    const stage = getStage();
+    const place = (side: Side, spot: Parameters<typeof stage.toGame>[0]): void => {
+      const s = stage.toGame(spot, this.game.canvas, GAME_WIDTH, GAME_HEIGHT);
+      side.zone.setPosition(s.x, s.y);
+      // gentle bob, under the object it names
+      side.plate.setPosition(
+        s.x,
+        Math.min(s.y + 250, GAME_HEIGHT - 90) + Math.sin(this.time.now / 450) * 8,
+      );
+    };
+    place(this.osman, this.world.carSpot());
+    place(this.safia, this.world.bunnySpot());
+    stage.render();
   }
 }

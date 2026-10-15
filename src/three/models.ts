@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { ANIMALS, FRUITS } from '../i18n/ru';
 
 /** Car Kit models (cars face +Z, ~2.5 units long). */
 export const PLAYER_CARS = ['race', 'police', 'firetruck', 'ambulance', 'taxi'] as const;
@@ -24,6 +26,7 @@ const TRACK = [
 ] as const;
 
 const cache = new Map<string, THREE.Object3D>();
+const clips = new Map<string, THREE.AnimationClip[]>();
 let loading: Promise<void> | null = null;
 
 /** Loads every model once. Missing files only warn, so the race still runs. */
@@ -35,6 +38,9 @@ export function loadModels(onProgress?: (v: number) => void): Promise<void> {
       (n) => [n, `assets/3d/cars/${n}.glb`] as const,
     ),
     ...TRACK.map((n) => [n, `assets/3d/track/${n}.glb`] as const),
+    // Cube Pets (with idle/walk/eat/dance/gesture animations) and Food Kit fruits
+    ...Object.keys(ANIMALS).map((n) => [`pet_${n}`, `assets/3d/pets/${n}.glb`] as const),
+    ...Object.keys(FRUITS).map((n) => [`food_${n}`, `assets/3d/food/${n}.glb`] as const),
   ];
   let done = 0;
   loading = Promise.all(
@@ -50,6 +56,7 @@ export function loadModels(onProgress?: (v: number) => void): Promise<void> {
             }
           });
           cache.set(name, normalize(gltf.scene));
+          if (gltf.animations.length) clips.set(name, gltf.animations);
         })
         .catch((e) => console.warn(`[models] could not load ${url}`, e))
         .finally(() => onProgress?.(++done / jobs.length)),
@@ -88,4 +95,65 @@ export function wheels(car: THREE.Object3D): THREE.Object3D[] {
     if (o.name.startsWith('wheel')) out.push(o);
   });
   return out;
+}
+
+/** A fruit model scaled so its average side is `size` (Food Kit fruits differ a lot in size and shape). */
+export function fruit(name: string, size: number): THREE.Object3D {
+  const obj = model(`food_${name}`, 1);
+  const box = new THREE.Box3().setFromObject(obj);
+  const dims = box.getSize(new THREE.Vector3());
+  obj.scale.setScalar(size / Math.max((dims.x + dims.y + dims.z) / 3, 0.001));
+  return obj;
+}
+
+export type PetAction =
+  'idle' | 'walk' | 'run' | 'eat' | 'dance' | 'gesture-positive' | 'gesture-negative';
+
+/** An animated Cube Pet with its own mixer. `play` cross-fades between the built-in clips. */
+export class Pet {
+  readonly obj: THREE.Object3D;
+  private readonly mixer: THREE.AnimationMixer;
+  private readonly actions = new Map<string, THREE.AnimationAction>();
+  private current: THREE.AnimationAction | null = null;
+
+  constructor(
+    readonly id: string,
+    scale = 1,
+  ) {
+    const src = cache.get(`pet_${id}`);
+    this.obj = src ? cloneSkinned(src) : model('box', 1);
+    this.obj.scale.setScalar(scale);
+    this.mixer = new THREE.AnimationMixer(this.obj);
+    for (const clip of clips.get(`pet_${id}`) ?? [])
+      this.actions.set(clip.name, this.mixer.clipAction(clip));
+    this.play('idle');
+  }
+
+  /** Loops the clip, or plays it once and returns to idle when `once` is set. */
+  play(name: PetAction, once = false): Promise<void> {
+    const next = this.actions.get(name);
+    if (!next) return Promise.resolve();
+    if (this.current !== next) {
+      next.reset().fadeIn(0.15).play();
+      this.current?.fadeOut(0.15);
+      this.current = next;
+    }
+    next.setLoop(once ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
+    next.clampWhenFinished = once;
+    if (!once) return Promise.resolve();
+    next.reset().play();
+    return new Promise((resolve) => {
+      const done = (e: { action: THREE.AnimationAction }): void => {
+        if (e.action !== next) return;
+        this.mixer.removeEventListener('finished', done);
+        this.play('idle');
+        resolve();
+      };
+      this.mixer.addEventListener('finished', done);
+    });
+  }
+
+  update(dt: number): void {
+    this.mixer.update(dt);
+  }
 }

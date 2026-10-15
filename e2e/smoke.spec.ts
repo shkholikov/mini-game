@@ -31,13 +31,26 @@ test('both games start from the title screen without errors', async ({ page }) =
   await page.goto('/');
   await expect.poll(() => activeScenes(page)).toContain('Title');
 
-  await tap(page, 1080, 470); // Сафия
+  const sides = await page.evaluate(() => {
+    const t = (
+      window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } }
+    ).__game.scene.getScene('Title') as {
+      osman: { zone: { x: number; y: number } };
+      safia: { zone: { x: number; y: number } };
+    };
+    return {
+      osman: { x: t.osman.zone.x, y: t.osman.zone.y },
+      safia: { x: t.safia.zone.x, y: t.safia.zone.y },
+    };
+  });
+  await tap(page, sides.safia.x, sides.safia.y); // Сафия
   await expect.poll(() => activeScenes(page)).toContain('Feed');
 
   await tap(page, 270, 80); // home
   await expect.poll(() => activeScenes(page)).toContain('Title');
 
-  await tap(page, 520, 470); // Осман
+  await page.waitForTimeout(1500);
+  await tap(page, sides.osman.x, sides.osman.y); // Осман
   await expect.poll(() => activeScenes(page)).toContain('Garage');
   // cars are 3D; their tap zones follow the projected positions
   const zone = await page.evaluate(() => {

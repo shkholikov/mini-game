@@ -1,52 +1,9 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH } from './config/game';
+import { GAME_WIDTH } from './config/game';
 import { voice } from './systems/voice';
 
 export const INK = 0x2f3b52;
 export const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-
-/** Sky + rolling hills background used by the menus and the feeding game. */
-export function drawMeadow(
-  scene: Phaser.Scene,
-  opts: { sky?: number; skyLow?: number } = {},
-): void {
-  const g = scene.add.graphics();
-  g.fillGradientStyle(
-    opts.sky ?? 0x7cc8ff,
-    opts.sky ?? 0x7cc8ff,
-    opts.skyLow ?? 0xdff3ff,
-    opts.skyLow ?? 0xdff3ff,
-    1,
-  );
-  g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-  scene.add.circle(1380, 120, 70, 0xffd84d);
-  scene.add.circle(1380, 120, 92, 0xffd84d, 0.25);
-  for (const [x, y, s] of [
-    [330, 230, 1],
-    [640, 190, 0.8],
-    [1160, 300, 0.9],
-  ] as const) {
-    const c = scene.add.container(x, y);
-    c.add([
-      scene.add.ellipse(0, 0, 160 * s, 60 * s, 0xffffff),
-      scene.add.ellipse(40 * s, -20 * s, 100 * s, 60 * s, 0xffffff),
-      scene.add.ellipse(-40 * s, -10 * s, 90 * s, 50 * s, 0xffffff),
-    ]);
-    scene.tweens.add({
-      targets: c,
-      x: x + 60,
-      duration: 9000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.inOut',
-    });
-  }
-  g.fillStyle(0x8fd16b, 1);
-  g.fillEllipse(300, 760, 1100, 420);
-  g.fillEllipse(1300, 780, 1200, 440);
-  g.fillStyle(0x6fbf4f, 1);
-  g.fillRect(0, 780, GAME_WIDTH, 120);
-}
 
 /** Round icon button; `draw` paints the icon inside a 0-centred graphics. */
 export function iconButton(
