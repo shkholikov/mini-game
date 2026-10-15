@@ -27,6 +27,9 @@ pnpm assets <dir>                 # re-copy Kenney CC0 files from unzipped packs
 - Pure, Phaser-free logic lives in `src/systems/` and is unit-tested: `feedLogic` (rounds, miss → hint escalation), `raceLogic` (lanes, track generation that never blocks all lanes; logic units are px, `RaceWorld.K` converts to world units), `save` (localStorage with defaults merge), `rng` (seeded).
 - `src/systems/voice.ts`: `voice().say(...ids)` plays `public/assets/voice/<id>.mp3` in sequence; a new line interrupts the old one; a missing file only warns.
 - All Russian text and voice lines are in `src/i18n/ru.ts` (animals, fruits, cars, tracks). After changing it, run `pnpm voice` (a test fails if mp3s are stale). Adding an animal also needs `public/assets/3d/pets/<id>.glb`.
+- UI kit in `src/ui/`: `theme.ts` (fonts Nunito + Russo One bundled via @fontsource, colours, `gameText`), `button.ts` (`candyButton`, `iconButton`, `homeButton`, `sticker`), `effects.ts` (confetti, hearts, code-made textures). Icons are Kenney Game Icons loaded as `icon_<name>`. Fonts are awaited (`loadFonts`) before the Phaser game is created.
+- `Title` shows a Play screen once per visit: that tap unlocks audio and fullscreens `#game` (both canvases; `scale.fullscreenTarget: 'game'`).
+- Portrait: `#rotate-hint` (HTML/CSS in `index.html`/`style.css`, text from `ru.ts`) covers the game and `main.ts` pauses the loop and sounds.
 - Base resolution 1600×900, `Scale.FIT`, landscape only.
 
 ## Rules for the kids' experience

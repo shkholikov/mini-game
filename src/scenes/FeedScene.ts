@@ -6,7 +6,7 @@ import { save } from '../systems/services';
 import { voice } from '../systems/voice';
 import { FEED_DISTANCE, FeedWorld } from '../three/FeedWorld';
 import { getStage, rayFromGame } from '../three/stage';
-import { confetti, hearts, homeButton, iconButton, replayIcon } from '../ui';
+import { COLOR, confetti, hearts, homeButton, iconButton } from '../ui';
 
 /** Сафия: feed each animal the fruit it wants, in a 3D meadow. No timers, no losing. */
 export class FeedScene extends Phaser.Scene {
@@ -36,7 +36,7 @@ export class FeedScene extends Phaser.Scene {
     this.index = 0;
     this.zones = [];
     this.slots = Array.from({ length: ANIMALS_PER_PARTY }, (_, i) =>
-      this.add.circle(800 + (i - 2) * 120, 80, 50, 0xffffff, 0.85).setStrokeStyle(6, 0xffffff),
+      this.slotFrame(800 + (i - 2) * 124, 86),
     );
 
     this.bubble = this.add.container(0, 0).setScale(0).setDepth(20);
@@ -64,7 +64,8 @@ export class FeedScene extends Phaser.Scene {
     this.bubble.add([
       this.add.circle(-150, 120, 14, 0xffffff),
       this.add.circle(-115, 88, 22, 0xffffff),
-      this.add.ellipse(0, 0, 260, 210, 0xffffff),
+      this.add.ellipse(6, 12, 260, 210, 0x000000, 0.15),
+      this.add.ellipse(0, 0, 260, 210, 0xffffff).setStrokeStyle(6, COLOR.yellow),
       this.add.image(0, 0, `thumb_fruit_${want}`).setScale(0.55),
     ]);
     this.tweens.add({ targets: this.bubble, scale: 1, duration: 400, ease: 'Back.out' });
@@ -167,10 +168,17 @@ export class FeedScene extends Phaser.Scene {
     this.busy = false;
   }
 
+  /** Empty sticker frame in the top row; fed animals pop into it. */
+  private slotFrame(x: number, y: number): Phaser.GameObjects.Arc {
+    this.add.circle(x, y + 5, 52, 0x000000, 0.15);
+    return this.add.circle(x, y, 52, 0xffffff, 0.7).setStrokeStyle(6, COLOR.yellow);
+  }
+
   private fillSlot(animal: string): void {
     const slot = this.slots[this.index]!;
     const img = this.add.image(slot.x, slot.y, `thumb_pet_${animal}`).setScale(0);
-    this.tweens.add({ targets: img, scale: 0.36, duration: 400, ease: 'Back.out' });
+    this.tweens.add({ targets: img, scale: 0.38, duration: 400, ease: 'Back.out' });
+    slot.setFillStyle(0xffffff, 1);
     voice().sfx('pop');
   }
 
@@ -180,6 +188,6 @@ export class FeedScene extends Phaser.Scene {
     await this.world.party();
     confetti(this);
     await voice().say('all_fed');
-    iconButton(this, 800, 780, 0x5cb85c, replayIcon, () => this.scene.restart(), 80);
+    iconButton(this, 800, 770, 'return', COLOR.green, () => this.scene.restart(), 150);
   }
 }

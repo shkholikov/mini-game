@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/game';
-import type { TrackId } from '../i18n/ru';
+import { TEXT, type TrackId } from '../i18n/ru';
 import { TRACKS, TRACK_ORDER } from '../systems/raceLogic';
 import { save } from '../systems/services';
 import { voice } from '../systems/voice';
 import { GarageWorld } from '../three/GarageWorld';
 import { PLAYER_CARS, type PlayerCar } from '../three/models';
 import { getStage } from '../three/stage';
-import { FONT, homeButton } from '../ui';
+import { gameText, homeButton, sticker } from '../ui';
 
 /** Осман: pick a car in the 3D showroom, then a track. */
 export class GarageScene extends Phaser.Scene {
@@ -29,6 +29,15 @@ export class GarageScene extends Phaser.Scene {
     this.events.once('shutdown', () => stage.hide());
 
     homeButton(this);
+    const sign = gameText(this, GAME_WIDTH / 2, 86, TEXT.garage, 'heading');
+    this.tweens.add({
+      targets: sign,
+      angle: { from: -2, to: 2 },
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.inOut',
+    });
     this.zones = PLAYER_CARS.map((name, i) => {
       const z = this.add.zone(0, 0, 230, 260).setInteractive({ useHandCursor: true });
       z.on('pointerdown', () => this.pickCar(name, i));
@@ -67,29 +76,24 @@ export class GarageScene extends Phaser.Scene {
       const x = 480 + i * 320;
       const c = this.add.container(x, 1100);
       const track = TRACKS[id];
-      const land = this.add.tileSprite(0, 0, 280, 280, track.land).setTileScale(0.6);
-      const road = this.add.rectangle(0, 0, 130, 280, track.road);
-      const line = this.add.rectangle(0, 0, 8, 280, 0xffffff, 0.7);
-      const thumb = this.add.image(0, 50, `thumb_${car}`).setScale(0.55);
-      const frame = this.add.rectangle(0, 0, 280, 280).setStrokeStyle(10, 0xffffff).setRounded(24);
-      c.add([land, road, line, thumb, frame]);
-      for (let k = 0; k < Math.min(cups[id], 5); k++)
-        c.add(this.add.image(-100 + k * 50, -105, 'cup').setScale(0.3));
-      if (cups[id] > 5)
-        c.add(
-          this.add
-            .text(160, -105, `+${cups[id] - 5}`, {
-              fontFamily: FONT,
-              fontSize: '30px',
-              color: '#fff',
-            })
-            .setOrigin(0.5),
-        );
-      c.setSize(280, 280).setInteractive({ useHandCursor: true });
-      this.tweens.add({ targets: c, y: 700, delay: i * 120, duration: 500, ease: 'Back.out' });
+      // card with a 3D-ish edge, a mini road and the chosen car
+      const base = this.add.graphics();
+      base.fillStyle(0x000000, 0.2).fillRoundedRect(-140, -132, 280, 300, 32);
+      base.fillStyle(0x1f2a52, 1).fillRoundedRect(-140, -140, 280, 300, 32);
+      const land = this.add.tileSprite(0, -10, 256, 230, track.land).setTileScale(0.6);
+      const road = this.add.rectangle(0, -10, 110, 230, track.road);
+      const line = this.add.rectangle(0, -10, 8, 230, 0xffffff, 0.7);
+      const thumb = this.add.image(0, 30, `thumb_${car}`).setScale(0.5);
+      const frame = this.add.graphics();
+      frame.lineStyle(8, 0xffffff, 1).strokeRoundedRect(-128, -125, 256, 230, 22);
+      const label = gameText(this, 0, 128, TEXT.tracks[id], 'label', { size: 38 });
+      c.add([base, land, road, line, thumb, frame, label]);
+      if (cups[id] > 0) c.add(sticker(this, 115, -120, 'cup', cups[id], 0.36));
+      c.setSize(280, 300).setInteractive({ useHandCursor: true });
+      this.tweens.add({ targets: c, y: 690, delay: i * 120, duration: 500, ease: 'Back.out' });
       this.tweens.add({
         targets: thumb,
-        y: 20,
+        y: 0,
         duration: 700 + i * 100,
         yoyo: true,
         repeat: -1,

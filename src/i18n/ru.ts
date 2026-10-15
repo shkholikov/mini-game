@@ -4,6 +4,12 @@ export const TEXT = {
   title: 'Осман и Сафия',
   osman: 'Осман',
   safia: 'Сафия',
+  rotateTitle: 'Поверните экран',
+  rotateSub: 'Игра работает только горизонтально',
+  garage: 'Гараж',
+  finish: 'Финиш!',
+  go: ['На старт!', 'Внимание!', 'Марш!'],
+  tracks: { city: 'Город', forest: 'Лес', desert: 'Пустыня' },
 } as const;
 
 export const ANIMALS = {
@@ -15,7 +21,6 @@ export const ANIMALS = {
   monkey: { name: 'Обезьянка', sound: 'У-у-а-а!' },
   panda: { name: 'Панда', sound: 'Ням-ням!' },
   elephant: { name: 'Слоник', sound: 'Ту-ру-ру!' },
-  pig: { name: 'Хрюшка', sound: 'Хрю-хрю!' },
   giraffe: { name: 'Жираф', sound: 'Ммм, вкусно!' },
 } as const;
 

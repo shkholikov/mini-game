@@ -9,6 +9,19 @@ export const SIGNATURE: Partial<Record<AnimalId, FruitId>> = { bunny: 'carrot', 
 
 export const ANIMALS_PER_PARTY = 5;
 
+/** Main colour of each 3D fruit. Fruits offered together never share a colour, so a 3-year-old can tell them apart. */
+export const FRUIT_COLOR: Record<FruitId, string> = {
+  apple: 'red',
+  strawberry: 'red',
+  cherries: 'red',
+  banana: 'yellow',
+  orange: 'orange',
+  carrot: 'orange',
+  pear: 'green',
+  watermelon: 'green',
+  grapes: 'purple',
+};
+
 export interface FeedRound {
   animal: AnimalId;
   want: FruitId;
@@ -31,10 +44,12 @@ export function makeParty(rng: Rng): FeedRound[] {
         rng,
         FRUIT_IDS.filter((f) => f !== 'carrot'),
       );
-    const distractors = shuffle(
-      rng,
-      FRUIT_IDS.filter((f) => f !== want),
-    ).slice(0, optionsCount(i) - 1);
+    const distractors: FruitId[] = [];
+    for (const f of shuffle(rng, FRUIT_IDS)) {
+      if (distractors.length === optionsCount(i) - 1) break;
+      const colors = [want, ...distractors].map((x) => FRUIT_COLOR[x]);
+      if (!colors.includes(FRUIT_COLOR[f])) distractors.push(f);
+    }
     return { animal, want, options: shuffle(rng, [want, ...distractors]) };
   });
 }

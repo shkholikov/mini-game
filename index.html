@@ -6,14 +6,37 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#8fd3ff" />
+    <meta name="theme-color" content="#5fbcff" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Осман и Сафия</title>
   </head>
   <body>
     <div id="game"></div>
-    <div id="rotate-hint" aria-hidden="true"><div class="tablet"></div></div>
+    <div id="rotate-hint" aria-live="polite">
+      <div class="rotate-anim">
+        <div class="device"><div class="screen"></div></div>
+        <svg class="arrow" viewBox="0 0 100 100" aria-hidden="true">
+          <path
+            d="M20 70 A40 40 0 0 1 80 40"
+            fill="none"
+            stroke="#ffd84d"
+            stroke-width="9"
+            stroke-linecap="round"
+          />
+          <path
+            d="M66 28 L84 40 L66 54"
+            fill="none"
+            stroke="#ffd84d"
+            stroke-width="9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <h1 id="rotate-title"></h1>
+      <p id="rotate-sub"></p>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

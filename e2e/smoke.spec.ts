@@ -31,26 +31,36 @@ test('both games start from the title screen without errors', async ({ page }) =
   await page.goto('/');
   await expect.poll(() => activeScenes(page)).toContain('Title');
 
+  await tap(page, 800, 600); // Play
+  await page.waitForTimeout(1500);
   const sides = await page.evaluate(() => {
-    const t = (
-      window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } }
-    ).__game.scene.getScene('Title') as {
-      osman: { zone: { x: number; y: number } };
-      safia: { zone: { x: number; y: number } };
+    const g = (window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } })
+      .__game;
+    const t = g.scene.getScene('Title') as {
+      sides: {
+        osman: { zone: { x: number; y: number } };
+        safia: { zone: { x: number; y: number } };
+      };
     };
     return {
-      osman: { x: t.osman.zone.x, y: t.osman.zone.y },
-      safia: { x: t.safia.zone.x, y: t.safia.zone.y },
+      osman: { x: t.sides.osman.zone.x, y: t.sides.osman.zone.y },
+      safia: { x: t.sides.safia.zone.x, y: t.sides.safia.zone.y },
     };
   });
   await tap(page, sides.safia.x, sides.safia.y); // Сафия
   await expect.poll(() => activeScenes(page)).toContain('Feed');
 
-  await tap(page, 270, 80); // home
+  await tap(page, 270, 86); // home
   await expect.poll(() => activeScenes(page)).toContain('Title');
 
   await page.waitForTimeout(1500);
-  await tap(page, sides.osman.x, sides.osman.y); // Осман
+  const again = await page.evaluate(() => {
+    const g = (window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } })
+      .__game;
+    const t = g.scene.getScene('Title') as { sides: { osman: { zone: { x: number; y: number } } } };
+    return { x: t.sides.osman.zone.x, y: t.sides.osman.zone.y };
+  });
+  await tap(page, again.x, again.y); // Осман
   await expect.poll(() => activeScenes(page)).toContain('Garage');
   // cars are 3D; their tap zones follow the projected positions
   const zone = await page.evaluate(() => {
@@ -61,7 +71,7 @@ test('both games start from the title screen without errors', async ({ page }) =
   });
   await tap(page, zone.x, zone.y);
   await page.waitForTimeout(2500);
-  await tap(page, 480, 700); // city track
+  await tap(page, 480, 690); // city track
   await expect.poll(() => activeScenes(page)).toContain('Race');
 
   expect(errors).toEqual([]);

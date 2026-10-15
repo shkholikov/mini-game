@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ANIMALS_PER_PARTY, makeParty, missAction, optionsCount } from '../src/systems/feedLogic';
+import {
+  ANIMALS_PER_PARTY,
+  FRUIT_COLOR,
+  makeParty,
+  missAction,
+  optionsCount,
+} from '../src/systems/feedLogic';
 import { createRng } from '../src/systems/rng';
 
 describe('feedLogic', () => {
@@ -18,6 +24,15 @@ describe('feedLogic', () => {
         expect(new Set(r.options).size).toBe(r.options.length);
         expect(r.options).toHaveLength(optionsCount(i));
       });
+    }
+  });
+
+  it('never offers two fruits of the same colour together', () => {
+    for (let seed = 1; seed < 200; seed++) {
+      for (const r of makeParty(createRng(seed))) {
+        const colors = r.options.map((f) => FRUIT_COLOR[f]);
+        expect(new Set(colors).size).toBe(colors.length);
+      }
     }
   });
 

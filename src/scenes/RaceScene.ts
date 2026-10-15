@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config/game';
-import { MAX_SPOKEN_NUMBER, type TrackId } from '../i18n/ru';
+import { MAX_SPOKEN_NUMBER, TEXT, type TrackId } from '../i18n/ru';
 import {
   LANE_COUNT,
   TRACKS,
@@ -15,7 +15,16 @@ import { save } from '../systems/services';
 import { voice } from '../systems/voice';
 import { RaceWorld } from '../three/RaceWorld';
 import { getStage } from '../three/stage';
-import { FONT, confetti, homeButton, iconButton, playIcon, replayIcon } from '../ui';
+import {
+  COLOR,
+  FONT,
+  INK_HEX,
+  confetti,
+  gameText,
+  gradientFill,
+  homeButton,
+  iconButton,
+} from '../ui';
 
 const BASE_SPEED = 560;
 const MAX_EXTRA_SPEED = 260;
@@ -87,29 +96,30 @@ export class RaceScene extends Phaser.Scene {
   }
 
   private makeHud(car: string): void {
-    const left = 500;
-    const right = 1100;
+    // progress: a little road from start to the chequered flag, with Осман's car on it
+    const left = 520;
+    const right = 1080;
+    const g = this.add.graphics().setDepth(90);
+    g.fillStyle(0x000000, 0.2).fillRoundedRect(left - 40, 62, right - left + 80, 52, 26);
+    g.fillStyle(0x4a4f57, 1).fillRoundedRect(left - 40, 54, right - left + 80, 52, 26);
+    g.lineStyle(5, 0xffffff, 1).strokeRoundedRect(left - 40, 54, right - left + 80, 52, 26);
+    g.fillStyle(0xffffff, 0.8);
+    for (let x = left; x < right - 10; x += 40) g.fillRect(x, 78, 22, 5);
     this.add
-      .rectangle((left + right) / 2, 70, right - left + 40, 36, 0x000000, 0.35)
-      .setRounded(18)
-      .setDepth(90);
-    this.add.rectangle((left + right) / 2, 70, right - left, 10, 0xffffff, 0.8).setDepth(90);
-    this.add
-      .image(right + 10, 70, 'checker')
-      .setScale(0.35, 1)
+      .image(right + 14, 80, 'checker')
+      .setScale(0.3, 1.05)
       .setDepth(91);
-    this.miniCar = this.add.image(left, 62, `thumb_${car}`).setScale(0.32).setDepth(92);
+    this.miniCar = this.add.image(left, 72, `thumb_${car}`).setScale(0.3).setDepth(92);
     this.miniCar.setData('range', [left, right]);
 
-    this.add.circle(1330, 80, 64, 0xffffff, 0.9).setDepth(90);
-    this.add.image(1300, 80, 'star').setScale(0.55).setDepth(91);
+    // star counter pill
+    const pill = this.add.graphics().setDepth(90);
+    pill.fillStyle(0x000000, 0.2).fillRoundedRect(1215, 46, 190, 84, 42);
+    pill.fillStyle(0xffffff, 1).fillRoundedRect(1215, 38, 190, 84, 42);
+    pill.lineStyle(6, COLOR.yellow, 1).strokeRoundedRect(1215, 38, 190, 84, 42);
+    this.add.image(1262, 80, 'star').setScale(0.6).setDepth(91);
     this.starText = this.add
-      .text(1352, 80, '0', {
-        fontFamily: FONT,
-        fontSize: '48px',
-        fontStyle: 'bold',
-        color: '#2f3b52',
-      })
+      .text(1340, 80, '0', { fontFamily: FONT.race, fontSize: '50px', color: INK_HEX })
       .setOrigin(0.5)
       .setDepth(91);
   }
@@ -142,14 +152,23 @@ export class RaceScene extends Phaser.Scene {
   }
 
   private async countdown(): Promise<void> {
-    const lights = this.add.image(800, 300, 'lights').setScale(2.4).setDepth(95);
-    this.tweens.add({ targets: lights, scale: 2.7, duration: 500, yoyo: true, repeat: 2 });
+    const lights = this.add.image(800, 250, 'lights').setScale(2.4).setDepth(95);
+    const words = TEXT.go.map((w, i) => {
+      const t = gameText(this, 800, 430, w, 'heading', { size: 110 }).setDepth(96).setScale(0);
+      gradientFill(t, i === 2 ? '#c8ff8a' : '#fff6a8', i === 2 ? '#3fbf4a' : '#ffb330');
+      return t;
+    });
+    words.forEach((t, i) => {
+      this.tweens.add({ targets: t, scale: 1, delay: i * 850, duration: 300, ease: 'Back.out' });
+      if (i < words.length - 1)
+        this.tweens.add({ targets: t, alpha: 0, delay: i * 850 + 700, duration: 150 });
+    });
     await voice().say('ready');
     this.tweens.add({
-      targets: lights,
+      targets: [lights, ...words],
       alpha: 0,
       duration: 300,
-      onComplete: () => lights.destroy(),
+      onComplete: () => [lights, ...words].forEach((o) => o.destroy()),
     });
     this.running = true;
   }
@@ -290,11 +309,30 @@ export class RaceScene extends Phaser.Scene {
     confetti(this);
     voice().sfx('correct');
 
-    const cup = this.add.image(800, 400, 'cup').setScale(0).setDepth(120);
     this.add
-      .rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.25)
+      .rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.3)
       .setDepth(110);
-    this.tweens.add({ targets: cup, scale: 2.2, duration: 700, ease: 'Back.out' });
+    const card = this.add.container(800, 1200).setDepth(120);
+    const panel = this.add.graphics();
+    panel.fillStyle(0x000000, 0.2).fillRoundedRect(-330, -300, 660, 600, 48);
+    panel.fillStyle(0xffffff, 1).fillRoundedRect(-330, -312, 660, 600, 48);
+    panel.lineStyle(10, COLOR.yellow, 1).strokeRoundedRect(-330, -312, 660, 600, 48);
+    const title = gameText(this, 0, -250, TEXT.finish, 'heading', { size: 80 });
+    gradientFill(title, '#fff6a8', '#ffb330');
+    const cup = this.add.image(0, -60, 'cup').setScale(1.6);
+    const starRow = this.add.container(0, 120);
+    starRow.add(this.add.image(-50, 0, 'star').setScale(0.75));
+    starRow.add(
+      this.add
+        .text(30, 0, String(this.stars), {
+          fontFamily: FONT.race,
+          fontSize: '64px',
+          color: INK_HEX,
+        })
+        .setOrigin(0, 0.5),
+    );
+    card.add([panel, title, cup, starRow]);
+    this.tweens.add({ targets: card, y: 430, duration: 700, ease: 'Back.out' });
     this.tweens.add({
       targets: cup,
       angle: { from: -6, to: 6 },
@@ -307,17 +345,19 @@ export class RaceScene extends Phaser.Scene {
     const spoken = Math.min(this.stars, MAX_SPOKEN_NUMBER);
     await voice().say('finish', ...(spoken > 0 ? ['stars', `num_${spoken}`] : []), 'cup');
 
-    iconButton(
-      this,
-      640,
-      740,
-      0x5cb85c,
-      replayIcon,
-      () => this.scene.restart({ track: id }),
-      80,
-    ).setDepth(130);
-    iconButton(this, 960, 740, 0x4a90e2, playIcon, () => this.scene.start('Garage'), 80).setDepth(
-      130,
+    card.add(
+      iconButton(
+        this,
+        -120,
+        230,
+        'return',
+        COLOR.green,
+        () => this.scene.restart({ track: id }),
+        120,
+      ),
+    );
+    card.add(
+      iconButton(this, 120, 230, 'right', COLOR.blue, () => this.scene.start('Garage'), 120),
     );
   }
 }
