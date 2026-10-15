@@ -13,7 +13,8 @@ pnpm test                         # vitest (logic + voice files up to date)
 pnpm vitest run tests/raceLogic.test.ts   # single file
 pnpm test:e2e                     # playwright smoke (builds, serves on :4173)
 pnpm lint                         # eslint + prettier --check
-pnpm voice                        # regenerate Russian voice mp3s from src/i18n/ru.ts (macOS `say`, voice Milena, + ffmpeg)
+pnpm voice                        # regenerate voice mp3s from src/i18n/ru.ts: ElevenLabs voice "Jessica" if ELEVENLABS_API_KEY is in .env.local, else macOS Milena
+pnpm voice:samples [voiceId…]     # short ElevenLabs samples into voice-samples/ to compare voices
 pnpm assets <dir>                 # re-copy Kenney CC0 files from unzipped packs in <dir>
 ```
 
@@ -41,4 +42,4 @@ pnpm assets <dir>                 # re-copy Kenney CC0 files from unzipped packs
 
 ## Assets
 
-All art is Kenney CC0 (`public/assets/LICENSE-kenney-*.txt`): 3D Car Kit, Racing Kit, Cube Pets and Food Kit in `public/assets/3d/` (each pack keeps its own `Textures/colormap.png`), plus 2D UI sounds and a few 2D race tiles. Voice: generated TTS (macOS Milena).
+All art is Kenney CC0 (`public/assets/LICENSE-kenney-*.txt`): 3D Car Kit, Racing Kit, Cube Pets and Food Kit in `public/assets/3d/` (each pack keeps its own `Textures/colormap.png`), plus 2D UI sounds and a few 2D race tiles. Voice: ElevenLabs TTS, premade voice "Jessica" (free plan: non-commercial, credit ElevenLabs; library voices need a paid plan).

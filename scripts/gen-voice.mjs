@@ -1,5 +1,5 @@
 // Generates Russian voice files from src/i18n/ru.ts.
-//   ElevenLabs (when ELEVENLABS_API_KEY and ELEVENLABS_VOICE_ID are set in .env.local) or
+//   ElevenLabs (when ELEVENLABS_API_KEY is set in .env.local) or
 //   macOS `say` (voice Milena) as a fallback. Output is trimmed and saved as mono mp3.
 // Only re-generates lines whose text or voice changed (manifest in public/assets/voice/manifest.json).
 import { execFileSync } from 'node:child_process';
@@ -9,7 +9,9 @@ import { join } from 'node:path';
 import { VOICE } from '../src/i18n/ru.ts';
 
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const eleven = process.env.ELEVENLABS_API_KEY && process.env.ELEVENLABS_VOICE_ID;
+// The game's voice: ElevenLabs "Jessica – Playful, Bright, Warm" (chosen by the family). Override with ELEVENLABS_VOICE_ID.
+const VOICE_ID = process.env.ELEVENLABS_VOICE_ID ?? 'cgSgspJ2msm6clMCkdW9';
+const eleven = Boolean(process.env.ELEVENLABS_API_KEY);
 const speak = eleven ? (await import('./eleven.mjs')).speak : null;
 
 const out = 'public/assets/voice';
@@ -17,7 +19,7 @@ const manifestPath = join(out, 'manifest.json');
 mkdirSync(out, { recursive: true });
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
 const voice = process.env.VOICE ?? 'Milena';
-const provider = eleven ? `eleven:${process.env.ELEVENLABS_VOICE_ID}` : `mac:${voice}`;
+const provider = eleven ? `eleven:${VOICE_ID}` : `mac:${voice}`;
 const tmp = join(tmpdir(), 'voice-src');
 
 let made = 0;
@@ -25,7 +27,7 @@ for (const [id, text] of Object.entries(VOICE)) {
   const file = join(out, `${id}.mp3`);
   const stamp = `${provider}|${text}`;
   if (manifest[id] === stamp && existsSync(file)) continue;
-  if (speak) writeFileSync(tmp, await speak(process.env.ELEVENLABS_VOICE_ID, text));
+  if (speak) writeFileSync(tmp, await speak(VOICE_ID, text));
   else execFileSync('say', ['-v', voice, '-r', '165', '-o', `${tmp}.aiff`, text]);
   execFileSync('ffmpeg', [
     '-loglevel',
