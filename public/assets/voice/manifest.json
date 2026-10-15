@@ -1,6 +1,6 @@
 {
   "who_plays": "eleven:cgSgspJ2msm6clMCkdW9|Кто играет? Осман, Сафия или Умар?",
-  "hi_osman": "eleven:cgSgspJ2msm6clMCkdW9|Осман, поехали на гонки!",
+  "hi_osman": "eleven:cgSgspJ2msm6clMCkdW9|Осман, поехали кататься!",
   "hi_safia": "eleven:cgSgspJ2msm6clMCkdW9|Сафия, давай покормим зверят!",
   "yum": "eleven:cgSgspJ2msm6clMCkdW9|Ням-ням! Спасибо!",
   "yum_safia": "eleven:cgSgspJ2msm6clMCkdW9|Вкусно! Спасибо, Сафия!",
@@ -8,7 +8,6 @@
   "hint": "eleven:cgSgspJ2msm6clMCkdW9|Вот это! Посмотри!",
   "all_fed": "eleven:cgSgspJ2msm6clMCkdW9|Ура! Все зверята сыты! Молодец, Сафия!",
   "garage": "eleven:cgSgspJ2msm6clMCkdW9|Выбери машину!",
-  "pick_track": "eleven:cgSgspJ2msm6clMCkdW9|Выбери трассу!",
   "ready": "eleven:cgSgspJ2msm6clMCkdW9|На старт! Внимание! Марш!",
   "boost": "eleven:cgSgspJ2msm6clMCkdW9|Турбо!",
   "oops": "eleven:cgSgspJ2msm6clMCkdW9|Ой! Осторожно!",
@@ -164,5 +163,13 @@
   "name_monkey": "eleven:cgSgspJ2msm6clMCkdW9|Обезьянка!",
   "name_panda": "eleven:cgSgspJ2msm6clMCkdW9|Панда!",
   "name_elephant": "eleven:cgSgspJ2msm6clMCkdW9|Слоник!",
-  "name_giraffe": "eleven:cgSgspJ2msm6clMCkdW9|Жираф!"
+  "name_giraffe": "eleven:cgSgspJ2msm6clMCkdW9|Жираф!",
+  "lets_go": "eleven:cgSgspJ2msm6clMCkdW9|Поехали!",
+  "island_go": "eleven:cgSgspJ2msm6clMCkdW9|Собери все звёздочки на острове!",
+  "island_hint": "eleven:cgSgspJ2msm6clMCkdW9|Держи пальчик на экране, и машинка поедет за ним!",
+  "wow": "eleven:cgSgspJ2msm6clMCkdW9|Ух ты! Полетели!",
+  "splash": "eleven:cgSgspJ2msm6clMCkdW9|Плюх!",
+  "strike": "eleven:cgSgspJ2msm6clMCkdW9|Страйк! Все кегли упали!",
+  "one_more": "eleven:cgSgspJ2msm6clMCkdW9|Осталась одна звёздочка!",
+  "all_stars": "eleven:cgSgspJ2msm6clMCkdW9|Ура! Ты собрал все звёзды!"
 }

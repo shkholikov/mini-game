@@ -16,7 +16,7 @@ const activeScenes = (page: Page) =>
       .map((s) => s.scene.key),
   );
 
-test('both games start from the title screen without errors', async ({ page }) => {
+test('every game starts from the title screen without errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {
@@ -70,8 +70,33 @@ test('both games start from the title screen without errors', async ({ page }) =
     return { x: z.x, y: z.y };
   });
   await tap(page, zone.x, zone.y);
-  await page.waitForTimeout(2500);
-  await tap(page, 480, 690); // city track
+  await expect.poll(() => activeScenes(page)).toContain('Island');
+
+  // hold a finger to the right of the car: it drives there
+  const carX = () =>
+    page.evaluate(
+      () =>
+        (
+          (
+            window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } }
+          ).__game.scene.getScene('Island') as { car: { x: number } }
+        ).car.x,
+    );
+  const before = await carX();
+  const b = (await page.locator('#game canvas:not(#stage3d)').boundingBox())!;
+  await page.mouse.move(b.x + b.width * 0.8, b.y + b.height * 0.5);
+  await page.mouse.down();
+  // software WebGL is slow here, so wait for the car rather than a fixed time
+  await expect.poll(carX, { timeout: 10_000 }).toBeGreaterThan(before + 2);
+  await page.mouse.up();
+
+  // drive through the city race arch
+  await page.evaluate(() => {
+    const s = (
+      window as unknown as { __game: { scene: { getScene: (k: string) => unknown } } }
+    ).__game.scene.getScene('Island') as { car: { x: number; z: number; speed: number } };
+    Object.assign(s.car, { x: -36, z: -25.5, speed: 0 });
+  });
   await expect.poll(() => activeScenes(page)).toContain('Race');
 
   expect(errors).toEqual([]);

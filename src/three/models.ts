@@ -25,6 +25,8 @@ const TRACK = [
   'pylon',
   'bannerTowerRed',
   'bannerTowerGreen',
+  // Осман's island
+  'pitsGarage',
 ] as const;
 
 const cache = new Map<string, THREE.Object3D>();

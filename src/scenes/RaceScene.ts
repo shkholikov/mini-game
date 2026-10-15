@@ -357,7 +357,7 @@ export class RaceScene extends Phaser.Scene {
       ),
     );
     card.add(
-      iconButton(this, 120, 230, 'right', COLOR.blue, () => this.scene.start('Garage'), 120),
+      iconButton(this, 120, 230, 'right', COLOR.blue, () => this.scene.start('Island'), 120),
     );
   }
 }

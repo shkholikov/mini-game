@@ -7,6 +7,8 @@ export interface Progress {
   osman: {
     car: CarModel;
     races: number;
+    /** island: rounds = all 15 stars collected, stars = stars picked up in total */
+    island: { rounds: number; stars: number };
     cups: Record<TrackId, number>;
     bestStars: Record<TrackId, number>;
   };
@@ -27,6 +29,7 @@ export function defaultProgress(): Progress {
     osman: {
       car: 'race',
       races: 0,
+      island: { rounds: 0, stars: 0 },
       cups: { city: 0, forest: 0, desert: 0 },
       bestStars: { city: 0, forest: 0, desert: 0 },
     },
@@ -45,6 +48,7 @@ function merge(raw: Partial<Progress>): Progress {
       ...raw.osman,
       // Cars used to be colours; anything unknown falls back to the race car.
       car: raw.osman?.car && raw.osman.car in CAR_MODELS ? raw.osman.car : d.osman.car,
+      island: { ...d.osman.island, ...raw.osman?.island },
       cups: { ...d.osman.cups, ...raw.osman?.cups },
       bestStars: { ...d.osman.bestStars, ...raw.osman?.bestStars },
     },

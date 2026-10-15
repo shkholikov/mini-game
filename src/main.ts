@@ -8,6 +8,7 @@ import { TEXT } from './i18n/ru';
 import { BootScene } from './scenes/BootScene';
 import { FeedScene } from './scenes/FeedScene';
 import { GarageScene } from './scenes/GarageScene';
+import { IslandScene } from './scenes/IslandScene';
 import { RaceScene } from './scenes/RaceScene';
 import { TitleScene } from './scenes/TitleScene';
 import { TractorScene } from './scenes/TractorScene';
@@ -39,7 +40,7 @@ async function start(): Promise<void> {
     },
     input: { activePointers: 3 },
     disableContextMenu: true,
-    scene: [BootScene, TitleScene, FeedScene, GarageScene, RaceScene, TractorScene],
+    scene: [BootScene, TitleScene, FeedScene, GarageScene, IslandScene, RaceScene, TractorScene],
   });
   initVoice(game);
 

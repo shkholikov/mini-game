@@ -9,6 +9,7 @@ export const TEXT = {
   rotateSub: 'Игра работает только горизонтально',
   garage: 'Гараж',
   finish: 'Финиш!',
+  allStars: 'Все звёзды!',
   go: ['На старт!', 'Внимание!', 'Марш!'],
   tracks: { city: 'Город', forest: 'Лес', desert: 'Пустыня' },
   // parent panel in Умар's tractor mode (adults read these, not the kids)
@@ -98,7 +99,7 @@ export const MAX_SPOKEN_NUMBER = 30;
 function build(): Record<string, string> {
   const v: Record<string, string> = {
     who_plays: 'Кто играет? Осман, Сафия или Умар?',
-    hi_osman: 'Осман, поехали на гонки!',
+    hi_osman: 'Осман, поехали кататься!',
     hi_safia: 'Сафия, давай покормим зверят!',
     hi_umar: 'Умар, поехали на тракторе!',
     // Сафия
@@ -109,13 +110,21 @@ function build(): Record<string, string> {
     all_fed: 'Ура! Все зверята сыты! Молодец, Сафия!',
     // Осман
     garage: 'Выбери машину!',
-    pick_track: 'Выбери трассу!',
+    lets_go: 'Поехали!',
     ready: 'На старт! Внимание! Марш!',
     boost: 'Турбо!',
     oops: 'Ой! Осторожно!',
     overtake: 'Обогнал!',
     finish: 'Финиш! Ты первый!',
     cup: 'Кубок твой! Молодец, Осман!',
+    // Осман's island
+    island_go: 'Собери все звёздочки на острове!',
+    island_hint: 'Держи пальчик на экране, и машинка поедет за ним!',
+    wow: 'Ух ты! Полетели!',
+    splash: 'Плюх!',
+    strike: 'Страйк! Все кегли упали!',
+    one_more: 'Осталась одна звёздочка!',
+    all_stars: 'Ура! Ты собрал все звёзды!',
     // Умар
     bibi: 'Би-би!',
     peek: 'Кто там прячется?',

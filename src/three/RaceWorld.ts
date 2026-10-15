@@ -116,28 +116,8 @@ export class RaceWorld {
     this.finish = this.gantry();
     s.add(this.start, this.finish);
 
-    const starShape = new THREE.Shape();
-    for (let i = 0; i < 10; i++) {
-      const r = i % 2 ? 0.32 : 0.7;
-      const a = -Math.PI / 2 + (i * Math.PI) / 5;
-      if (i === 0) starShape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
-      else starShape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-    }
-    this.starGeo = new THREE.ExtrudeGeometry(starShape, {
-      depth: 0.22,
-      bevelEnabled: true,
-      bevelSize: 0.06,
-      bevelThickness: 0.06,
-      bevelSegments: 2,
-    });
-    this.starGeo.center();
-    this.starMat = new THREE.MeshStandardMaterial({
-      color: 0xffd23f,
-      emissive: 0xffa800,
-      emissiveIntensity: 0.45,
-      metalness: 0.3,
-      roughness: 0.35,
-    });
+    this.starGeo = starGeometry();
+    this.starMat = starMaterial();
 
     this.camera.position.set(0, 5.2, 9.5);
     this.camera.lookAt(0, 1.2, -12);
@@ -519,7 +499,7 @@ function oil(): THREE.Object3D {
   return new THREE.Group().add(m);
 }
 
-function rock(size: number): THREE.Object3D {
+export function rock(size: number): THREE.Object3D {
   const m = new THREE.Mesh(
     new THREE.DodecahedronGeometry(size * 0.6, 0),
     new THREE.MeshStandardMaterial({ color: 0x9a8b78, flatShading: true, roughness: 1 }),
@@ -530,4 +510,34 @@ function rock(size: number): THREE.Object3D {
   m.castShadow = true;
   m.receiveShadow = true;
   return new THREE.Group().add(m);
+}
+
+/** The gold collectable star (shared by the race and the island). */
+export function starGeometry(): THREE.ExtrudeGeometry {
+  const shape = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? 0.32 : 0.7;
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    if (i === 0) shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: 0.22,
+    bevelEnabled: true,
+    bevelSize: 0.06,
+    bevelThickness: 0.06,
+    bevelSegments: 2,
+  });
+  geo.center();
+  return geo;
+}
+
+export function starMaterial(): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
+    color: 0xffd23f,
+    emissive: 0xffa800,
+    emissiveIntensity: 0.45,
+    metalness: 0.3,
+    roughness: 0.35,
+  });
 }
